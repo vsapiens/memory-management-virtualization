@@ -1,7 +1,7 @@
 #include "ProcessManager.hpp"
 #include <iostream>
 /*
-manager.cc
+manager.cpp
 This program is the main that handles the process manager of memory and the output handler
 
 Erick Gonzalez A01039589
@@ -11,6 +11,12 @@ Moisés Fernández
 Version: 1.0 last modified 14/11/2019
 */
 
+/*
+Function: Main
+It handles the input, process of counting the archives and the output for the program.
+Parameters: -
+Return: Int, describing the correct compilation of the program
+*/
 int main()
 {
 
