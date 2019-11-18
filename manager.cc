@@ -10,30 +10,30 @@
 // Moisés Fernández
 // Version: 1.0 last modified 14/11/2019
 
-
 // Function: Main
 // It handles the input, the process of counting the archives and the output for the program.
 // Parameters: -
 // Return: Int, describing the correct compilation of the program
-int main() {
+int main()
+{
+    char cOption;
 
-char cOption;
-
-while (cOption != 'f') {
-    std::cout << "Selecciona una opción del menú";
-    std::cin >> cOption;
-    switch (cOption) {
-    case 'C':
-    case 'c':
-        break;
-    case 'F':
-    case 'f':
-        break;  
-    default:
-        break;
+    while (cOption != 'f')
+    {
+        std::cout << "Selecciona una opción del menú";
+        std::cin >> cOption;
+        switch (cOption)
+        {
+        case 'C':
+        case 'c':
+            break;
+        case 'F':
+        case 'f':
+            break;
+        default:
+            break;
+        }
     }
-}
 
-
-return 0;
+    return 0;
 }
