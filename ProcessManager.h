@@ -8,34 +8,38 @@
 // Moisés Fernández
 // Version: 1.0 last modified 14/11/2019
 #pragma once
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
+
+namespace sisops{
 
 class ProcessManager {
-    public:
-    ProcessManager(std::string);
-    ~ProcessManager();
+public:
+ProcessManager(std::string& file);
+ProcessManager(std::string&& file);
+~ProcessManager();
 
-    void initialize();
+void initialize();
 
-    private:
-    std::string file;
-    std::vector<std::string> instructions;
+private:
+const std::string file_;
+std::vector<std::string> instructions_;
 };
 
-ProcessManager::ProcessManager(std::string file) {
-    this->file = file;
-}
+ProcessManager::ProcessManager(std::string& file):file_(file){}
+ProcessManager::ProcessManager(std::string&& file):file_(file){}
 
 void ProcessManager::initialize() {
     std::ifstream input;
-    input.open(file);
+    input.open(file_);
 
     std::string buffer;
     while (std::getline(input, buffer)) {
-        instructions.push_back(buffer);
+        instructions_.push_back(buffer);
     }
 
     input.close();
+}
+
 }

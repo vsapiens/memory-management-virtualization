@@ -10,48 +10,48 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-class Process {
-    public:
-    Process(int id, int size);
-    ~Process();
-
-    int getFrameNumber(int vAddress);
-    int getSwappingAddress(int vAddress);
-    int getValid(int vAddress);
-
-    private:
-    struct TableEntry {
-        int frameNumber;
-        int swappingAddress;
-        bool valid;
-
-        TableEntry(int f, int s, bool v) {
-            frameNumber = f;
-            swappingAddress = s;
-            valid = v;
-        }
+namespace sisops {
+namespace {
+struct TableEntry {
+    int frameNumber;
+    int swappingAddress;
+    bool valid;
+    TableEntry(int frame, int sAddress, bool v) {
+        frameNumber = frame;
+        swappingAddress = sAddress;
+        valid = v;
     }
+};
+}
+class Process {
+public:
+Process(int id, int size);
+~Process();
 
-    int id;
-    int size;
-    vector<TableEntry> pageTable;
+int getFrameNumber(int vAddress);
+int getSwappingAddress(int vAddress);
+int getValid(int vAddress);
+
+private:
+const int id_;
+const int size_;
+std::vector<TableEntry> pageTable;
 
 };
 
-Process::Process(int id, int size) {
-    this->id = id;
-    this->size = size;
-}
+Process::Process(int id, int size):id_(id),size_(size){}
 
 int Process::getFrameNumber(int vAddress) {
-    return pageTable[vAddress / size].frameNumber;
+    return pageTable[vAddress / size_].frameNumber;
 }
 
 int Process::getSwappingAddress(int vAddress) {
-    return pageTable[vAddress / size].swappingAddress;
+    return pageTable[vAddress / size_].swappingAddress;
 }
 
 int Process::getValid(int vAddress) {
-    return pageTable[vAddress / size].valid;
+    return pageTable[vAddress / size_].valid;
+}
 }
