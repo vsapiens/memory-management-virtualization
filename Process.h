@@ -34,6 +34,10 @@ class Process {
     int getSwappingAddress(int vAddress);
     int getValid(int vAddress);
 
+    void setFrameNumber(int vAddress, int frameNumber);
+    void setSwappingAddress(int vAddress, int swappingAddress);
+    void setValid(int vAddress, bool valid);
+
  private:
     const int id_;
     const int size_;
@@ -55,4 +59,17 @@ int Process::getSwappingAddress(int vAddress) {
 int Process::getValid(int vAddress) {
     return pageTable[vAddress / size_].valid;
 }
+
+void Process::setFrameNumber(int vAddress, int frameNumber) {
+    pageTable[vAddress / size_].frameNumber = frameNumber;
+}
+
+void Process::setSwappingAddress(int vAddress, int swappingAddress) {
+    pageTable[vAddress / size_].swappingAddress = swappingAddress;
+}
+
+void Process::setValid(int vAddress, bool valid) {
+    pageTable[vAddress / size_].valid = valid;
+}
+
 }
