@@ -48,27 +48,27 @@ class Process {
 
 Process::Process(int id, int size):id_(id),size_(size){}
 
-int Process::getFrameNumber(int vAddress) {
+inline int Process::getFrameNumber(int vAddress) {
     return pageTable[vAddress / size_].frameNumber;
 }
 
-int Process::getSwappingAddress(int vAddress) {
+inline int Process::getSwappingAddress(int vAddress) {
     return pageTable[vAddress / size_].swappingAddress;
 }
 
-int Process::getValid(int vAddress) {
+inline int Process::getValid(int vAddress) {
     return pageTable[vAddress / size_].valid;
 }
 
-void Process::setFrameNumber(int vAddress, int frameNumber) {
+inline void Process::setFrameNumber(int vAddress, int frameNumber) {
     pageTable[vAddress / size_].frameNumber = frameNumber;
 }
 
-void Process::setSwappingAddress(int vAddress, int swappingAddress) {
+inline void Process::setSwappingAddress(int vAddress, int swappingAddress) {
     pageTable[vAddress / size_].swappingAddress = swappingAddress;
 }
 
-void Process::setValid(int vAddress, bool valid) {
+inline void Process::setValid(int vAddress, bool valid) {
     pageTable[vAddress / size_].valid = valid;
 }
 
