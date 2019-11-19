@@ -15,16 +15,16 @@
 namespace sisops{
 
 class ProcessManager {
-public:
-ProcessManager(std::string& file);
-ProcessManager(std::string&& file);
-~ProcessManager();
+ public:
+    ProcessManager(std::string& file);
+    ProcessManager(std::string&& file);
+    ~ProcessManager();
 
 void initialize();
 
-private:
-const std::string file_;
-std::vector<std::string> instructions_;
+ private:
+    const std::string file_;
+    std::vector<std::string> instructions_;
 };
 
 ProcessManager::ProcessManager(std::string& file):file_(file){}

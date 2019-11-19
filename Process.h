@@ -26,20 +26,21 @@ struct TableEntry {
 };
 }
 class Process {
-public:
-Process(int id, int size);
-~Process();
+ public:
+    Process(int id, int size);
+    ~Process();
 
-int getFrameNumber(int vAddress);
-int getSwappingAddress(int vAddress);
-int getValid(int vAddress);
+    int getFrameNumber(int vAddress);
+    int getSwappingAddress(int vAddress);
+    int getValid(int vAddress);
 
-private:
-const int id_;
-const int size_;
-std::vector<TableEntry> pageTable;
+ private:
+    const int id_;
+    const int size_;
+    std::vector<TableEntry> pageTable;
 
 };
+
 
 Process::Process(int id, int size):id_(id),size_(size){}
 
