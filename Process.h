@@ -13,29 +13,25 @@
 #include <vector>
 
 namespace sisops {
-namespace {
+
 struct TableEntry {
     int frameNumber;
-    int swappingAddress;
     bool valid;
-    TableEntry(int frame, int sAddress, bool v) {
+    TableEntry(int frame, bool v) {
         frameNumber = frame;
-        swappingAddress = sAddress;
         valid = v;
     }
 };
-}
+
 class Process {
  public:
     Process(int id, int size);
     ~Process();
 
     int getFrameNumber(int vAddress);
-    int getSwappingAddress(int vAddress);
     int getValid(int vAddress);
 
     void setFrameNumber(int vAddress, int frameNumber);
-    void setSwappingAddress(int vAddress, int swappingAddress);
     void setValid(int vAddress, bool valid);
 
  private:
@@ -52,10 +48,6 @@ inline int Process::getFrameNumber(int vAddress) {
     return pageTable[vAddress / size_].frameNumber;
 }
 
-inline int Process::getSwappingAddress(int vAddress) {
-    return pageTable[vAddress / size_].swappingAddress;
-}
-
 inline int Process::getValid(int vAddress) {
     return pageTable[vAddress / size_].valid;
 }
@@ -64,9 +56,6 @@ inline void Process::setFrameNumber(int vAddress, int frameNumber) {
     pageTable[vAddress / size_].frameNumber = frameNumber;
 }
 
-inline void Process::setSwappingAddress(int vAddress, int swappingAddress) {
-    pageTable[vAddress / size_].swappingAddress = swappingAddress;
-}
 
 inline void Process::setValid(int vAddress, bool valid) {
     pageTable[vAddress / size_].valid = valid;

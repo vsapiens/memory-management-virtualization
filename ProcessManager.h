@@ -11,35 +11,32 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <queue>
+
+#include "Process.h"
 
 namespace sisops{
+    struct PageIdentifier{
+        const int process_id;
+        const int page;
+        PageIdentifier(const int process,const int page_id):process_id(process),page(page_id){};
+    };
 
 class ProcessManager {
  public:
-    ProcessManager(std::string& file);
-    ProcessManager(std::string&& file);
     ~ProcessManager();
-
-void initialize();
+    void doProcess();
 
  private:
-    const std::string file_;
-    std::vector<std::string> instructions_;
+    void create();
+    void access();
+    void free();
+    void reset();
+    void exit();
+    std::queue<PageIdentifier> fifo;
+    std::queue<PageIdentifier> lru;
+    std::vector<Process> processes;
 };
 
-ProcessManager::ProcessManager(std::string& file):file_(file){}
-ProcessManager::ProcessManager(std::string&& file):file_(file){}
-
-void ProcessManager::initialize() {
-    std::ifstream input;
-    input.open(file_);
-
-    std::string buffer;
-    while (std::getline(input, buffer)) {
-        instructions_.push_back(buffer);
-    }
-
-    input.close();
-}
 
 }
