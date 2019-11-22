@@ -13,28 +13,29 @@
 #include <queue>
 
 #include "Process.h"
+#include "Token.h"
 
 namespace sisops{
-    struct PageIdentifier{
-        const int process_id;
-        const int page;
-        PageIdentifier(const int process,const int page_id):process_id(process),page(page_id){};
-    };
+struct PageIdentifier{
+    const int process_id;
+    const int page;
+    PageIdentifier(const int process,const int page_id):process_id(process),page(page_id){};
+};
 
 class ProcessManager {
- public:
-    ~ProcessManager();
-    void doProcess();
-
  private:
-    void create();
-    void access();
-    void free();
-    void reset();
-    void exit();
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
     std::vector<Process> processes;
+
+    void Create();
+    void Access();
+    void Free();
+    void Reset();
+    void Exit();
+ public:
+    ~ProcessManager();
+    void DoProcess(std::vector<Token> instruction);
 };
 
 
