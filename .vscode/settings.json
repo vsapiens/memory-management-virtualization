@@ -62,6 +62,13 @@
         "utility": "cpp",
         "vector": "cpp",
         "*.tcc": "cpp",
-        "hashtable": "cpp"
+        "hashtable": "cpp",
+        "strstream": "cpp",
+        "list": "cpp",
+        "numeric": "cpp",
+        "thread": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp"
     }
 }

@@ -28,10 +28,11 @@ class ProcessManager {
     std::queue<PageIdentifier> lru;
     std::vector<Process> processes;
 
-    void Create();
-    void Access();
-    void Free();
-    void Reset();
+    void Load(std::vector<Token>& instruction);
+    void Create(std::vector<Token>& instruction);
+    void Access(std::vector<Token>& instruction);
+    void Free(std::vector<Token>& instruction);
+    void Finalize();
     void Exit();
  public:
     ~ProcessManager();
