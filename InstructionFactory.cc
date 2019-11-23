@@ -21,7 +21,16 @@ std::unique_ptr<Instruction> InstructionFactory::MakeInstruction(const std::vect
             return std::make_unique<FreeInstruction>(tokens[0].value, tokens[1].value);
         }
         case TokenType::Comment: {
-            return std::make_unique<CommentInstruction>();
+            return std::make_unique<CommentInstruction>(tokens[0].value, tokens[1].value);
+        }
+        case TokenType::Finalize: {
+            return std::make_unique<FinalizeInstruction>(tokens[0].value);
+        }
+        case TokenType::Exit: {
+            return std::make_unique<ExitInstruction>(tokens[0].value);
+        }
+        default: {
+            return nullptr;
         }
     }
 }

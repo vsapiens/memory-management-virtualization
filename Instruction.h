@@ -13,6 +13,7 @@ enum class InstructionType {
 };
 
 class Instruction {
+ public:
  protected:
     InstructionType instruction_type;
     InstructionType GetInstructionType(const std::string& type);
