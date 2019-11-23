@@ -7,6 +7,9 @@
 // Moisés Fernández A01197049
 // Version: 1.0 last modified 14/11/2019
 #pragma once
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace sisops{
 
