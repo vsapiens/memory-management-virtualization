@@ -21,6 +21,13 @@ class Parser {
     private:
     int token_index = 0;
     void match(std::vector<Token> tokens, Token token);
+    void parseIns(vector<Token> tokens);
+    void parsePPart(vector<Token> tokens);
+    void parseAPart(vector<Token> tokens);
+    void parseLPart(vector<Token> tokens);
+    void parseCPart(vector<Token> tokens);
+    void parsBit(vector<Token> tokens);
+    void parsNumber(vector<Token> tokens);
 };
 
 Parser::Parser(){}
