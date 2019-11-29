@@ -14,6 +14,7 @@
 
 #include "Process.h"
 #include "Token.h"
+#include "util/InstructionFactory.h"
 
 namespace sisops{
 struct PageIdentifier{
@@ -27,8 +28,9 @@ class ProcessManager {
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
     std::vector<Process> processes;
+    InstructionFactory factory;
 
-    void Load(std::vector<Token>& instruction);
+    void Load(std::unique_ptr<Instruction> current_instruction);
     void Create(std::vector<Token>& instruction);
     void Access(std::vector<Token>& instruction);
     void Free(std::vector<Token>& instruction);

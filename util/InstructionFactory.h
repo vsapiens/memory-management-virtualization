@@ -7,13 +7,13 @@
 #include <vector>
 
 #include "Instruction.h"
-#include "Token.h"
+#include "../Token.h"
 
 namespace sisops {
 
 class InstructionFactory final {
  public:
-    std::unique_ptr<Instruction> MakeInstruction(const std::vector<Token>& tokens) const;
+    std::shared_ptr<Instruction> MakeInstruction(const std::vector<Token>& tokens) const;
 };
 
 }

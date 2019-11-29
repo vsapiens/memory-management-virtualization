@@ -12,9 +12,9 @@
 #include "Reader.h"
 #include "Token.h"
 
-#include "Instruction.h"
-#include "InstructionFactory.h"
-#include "InstructionFactory.cc"
+#include "util/Instruction.h"
+#include "util/InstructionFactory.h"
+#include "util/InstructionFactory.cc"
 
 
 // Function: Main
@@ -44,5 +44,10 @@ int main()
     sisops::InstructionFactory insF;
 
     std::unique_ptr<sisops::Instruction> p = insF.MakeInstruction(tokens);
+    sisops::LoadInstruction *l = dynamic_cast<sisops::LoadInstruction*>(p.get());
+    std::cout << l->getBytes() << std::endl;
+    if(p) {
+        std::cout << "smn" << std::endl;
+    }
     return 0;
 }

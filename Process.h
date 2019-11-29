@@ -43,20 +43,20 @@ class Process {
 
 Process::Process(int id, int size):id_(id),size_(size){}
 
-inline int Process::getFrameNumber(int vAddress) {
+inline int Process::getFrameNumber(const int vAddress) {
     return pageTable[vAddress / size_].frameNumber;
 }
 
-inline int Process::getValid(int vAddress) {
+inline int Process::getValid(const int vAddress) {
     return pageTable[vAddress / size_].valid;
 }
 
-inline void Process::setFrameNumber(int vAddress, int frameNumber) {
+inline void Process::setFrameNumber(const int vAddress, const int frameNumber) {
     pageTable[vAddress / size_].frameNumber = frameNumber;
 }
 
 
-inline void Process::setValid(int vAddress, bool valid) {
+inline void Process::setValid(const int vAddress, const bool valid) {
     pageTable[vAddress / size_].valid = valid;
 }
 

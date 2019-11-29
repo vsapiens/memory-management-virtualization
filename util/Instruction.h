@@ -14,6 +14,7 @@ enum class InstructionType {
 
 class Instruction {
  public:
+    virtual ~Instruction(){}
  protected:
     InstructionType instruction_type;
     InstructionType GetInstructionType(const std::string& type);
@@ -43,6 +44,9 @@ InstructionType Instruction::GetInstructionType(const std::string& type) {
 class LoadInstruction : public Instruction {
  public:
     LoadInstruction(const std::string& type,const std::string& bytes, const std::string& id);
+    ~LoadInstruction(){};
+
+    int getBytes();
  private:
     int bytes_;
     int id_;
@@ -52,6 +56,10 @@ LoadInstruction::LoadInstruction(const std::string& type,const std::string& byte
     instruction_type = GetInstructionType(type);
     bytes_ = std::stoi(bytes);
     id_ = std::stoi(id);
+}
+
+int LoadInstruction::getBytes() {
+    return bytes_;
 }
 
 class AccessInstruction : public Instruction {
