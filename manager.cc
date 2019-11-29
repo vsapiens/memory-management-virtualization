@@ -31,7 +31,7 @@ int main()
     // for (const sisops::Token& token : tokens) {
     //     std::cout << token.value << "\t" <<  sisops::token_type_to_string(token.token_type) << std::endl;
     // }
-
+/*
     std::vector<sisops::Token> tokens;
     sisops::Token t(sisops::TokenType::Load, "P");
     sisops::Token b(sisops::TokenType::Integer, "32");
@@ -44,5 +44,9 @@ int main()
     sisops::InstructionFactory insF;
 
     std::unique_ptr<sisops::Instruction> p = insF.MakeInstruction(tokens);
+
+*/
+
+    std::vector<std::vector<sisops::Token>> tokens_list = sisops::readInputFile("test.txt");
     return 0;
 }
