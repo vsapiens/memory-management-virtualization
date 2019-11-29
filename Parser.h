@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Token.h"
 
 namespace sisops{
 
@@ -33,14 +34,14 @@ class Parser {
 Parser::Parser(){}
 
 void Parser::match(std::vector<Token> tokens, Token token) {
-        if (tokenIndex >= tokens.size()) {
+        if (token_index >= tokens.size()) {
             std::cerr << "Parsing error" << std::endl;
         }
 
-        if (tokens[tokenIndex].token_type != token.token_type) {
+        if (tokens[token_index].token_type != token.token_type) {
             std::cerr << "Parsring error" << std::endl;
         } else {
-            tokenIndex++;
+            token_index++;
         }
     }
 }
