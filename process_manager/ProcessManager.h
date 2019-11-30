@@ -14,7 +14,7 @@
 
 #include "Process.h"
 #include "Token.h"
-#include "util/InstructionFactory.h"
+#include "instruction/InstructionFactory.h"
 
 namespace sisops{
 struct PageIdentifier{
@@ -29,13 +29,18 @@ class ProcessManager {
     std::queue<PageIdentifier> lru;
     std::vector<Process> processes;
     InstructionFactory factory;
-
-    void Load(std::unique_ptr<Instruction> current_instruction);
-    void Create(std::vector<Token>& instruction);
-    void Access(std::vector<Token>& instruction);
-    void Free(std::vector<Token>& instruction);
-    void Finalize();
-    void Exit();
+    // Loads a process into real memory.
+    void Load(const std::shared_ptr<Instruction> current_instruction);
+    // Tries to access a frame in memory, performs swap if needed.
+    void Access(const std::shared_ptr<Instruction> current_instruction);
+    // Displays a comment on screen.
+    void Comment(const std::shared_ptr<Instruction> current_instruction);
+    // Ends the execution of a process, freeing the memory it was using.
+    void Free(const std::shared_ptr<Instruction> current_instruction);
+    // Finalizes the current cicle of instructions, displays some information.
+    void Finalize(const std::shared_ptr<Instruction> current_instruction);
+    // Exits the program.
+    void Exit(const std::shared_ptr<Instruction> current_instruction);
  public:
     ~ProcessManager();
     void DoProcess(std::vector<Token> instruction);

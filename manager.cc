@@ -8,13 +8,12 @@
 // Version: 1.0 last modified 14/11/2019
 #include <iostream>
 #include <memory>
-#include "ProcessManager.h"
+#include "process_manager/ProcessManager.h"
 #include "Reader.h"
 #include "Token.h"
 
-#include "util/Instruction.h"
-#include "util/InstructionFactory.h"
-#include "util/InstructionFactory.cc"
+#include "instruction/Instruction.h"
+#include "instruction/InstructionFactory.h"
 
 
 // Function: Main

@@ -1,13 +1,26 @@
 #pragma once
+
+#include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
+#include "AccessInstruction.h"
+#include "CommentInstruction.h"
+#include "ExitInstruction.h"
+#include "FinalizeInstruction.h"
+#include "FreeInstruction.h"
+#include "LoadInstruction.h"
 #include "Instruction.h"
-#include "InstructionFactory.h"
 #include "../Token.h"
 
-
 namespace sisops {
+
+class InstructionFactory final {
+ public:
+    std::shared_ptr<Instruction> MakeInstruction(const std::vector<Token>& tokens) const;
+};
 
 std::shared_ptr<Instruction> InstructionFactory::MakeInstruction(const std::vector<Token>& tokens) const{
     switch(tokens[0].token_type) {
@@ -34,4 +47,5 @@ std::shared_ptr<Instruction> InstructionFactory::MakeInstruction(const std::vect
         }
     }
 }
+
 }
