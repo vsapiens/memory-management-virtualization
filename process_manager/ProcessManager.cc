@@ -11,6 +11,7 @@
 namespace sisops {
 void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<LoadInstruction>(current_instruction);
+    if(instruction->GetBytes() > )
 }
 void ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<AccessInstruction>(current_instruction);

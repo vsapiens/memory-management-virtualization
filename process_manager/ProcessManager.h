@@ -7,7 +7,7 @@
 // Moisés Fernández A01197049
 // Version: 1.0 last modified 14/11/2019
 #pragma once
-#include <fstream>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <queue>
@@ -28,6 +28,7 @@ class ProcessManager {
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
     std::vector<Process> processes;
+    std::vector<std::string> real_memory_;
     InstructionFactory factory;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -43,6 +44,10 @@ class ProcessManager {
     void Exit(const std::shared_ptr<Instruction> current_instruction);
  public:
     ~ProcessManager();
+    ProcessManager(const int memory_size) {
+        real_memory_.resize(2048);
+        std::fill(real_memory_.begin(), real_memory_.end(), "");
+    }
     void DoProcess(std::vector<Token> instruction);
 };
 
