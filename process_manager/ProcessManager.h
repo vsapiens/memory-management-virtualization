@@ -13,8 +13,8 @@
 #include <queue>
 
 #include "Process.h"
-#include "Token.h"
-#include "instruction/InstructionFactory.h"
+#include "../Token.h"
+#include "../instruction/InstructionFactory.h"
 
 namespace sisops{
 struct PageIdentifier{
