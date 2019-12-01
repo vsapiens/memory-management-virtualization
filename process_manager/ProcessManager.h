@@ -285,6 +285,20 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
 }
 OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<AccessInstruction>(current_instruction);
+    int id = instruction->GetId();
+    int virtual_address = instruction->GetVirtualAddress();
+    int option = instruction->GetOption();
+
+    OperationStatus status;
+
+    if(!ProcessExists(id)){
+        status.success = false;
+        status.message = "Tried to access a non-existing process.";
+        return status;
+    }
+
+
+
 }
 OperationStatus ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
