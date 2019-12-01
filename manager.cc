@@ -23,8 +23,8 @@
 // Return: Int, describing the correct compilation of the program
 int main()
 {
-    auto result = sisops::readAndParseInputFile("real_test.txt");
-    std::vector<std::vector<sisops::Token>> tokens = std::get<0>(result);
+    auto result = sisops::readAndParseInputFile("test2.txt");
+    std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
     std::vector<sisops::Error> errors = std::get<1>(result);
 
     if (errors.size() > 0) {
@@ -32,7 +32,15 @@ int main()
         for (const sisops::Error& e: errors) {
             std::cout << "PARSER: Line " << e.line << ": " << e.message << std::endl;
         }
+        exit(1);
     } else {
         std::cout << "PARSER: File free from errors" << std::endl;
+    }
+
+    sisops::ProcessManager pm(true);
+
+    for (const std::vector<sisops::Token>& tokens : token_list) {
+        sisops::OperationStatus result = pm.DoProcess(tokens);
+        std::cout << result.message << std::endl;
     }
 }
