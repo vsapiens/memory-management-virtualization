@@ -1,13 +1,8 @@
-#pragma once
 #include <memory>
 #include <vector>
 #include <cmath>
 
-#include "PageSize.h"
 #include "ProcessManager.h"
-#include "../Reader/Token.h"
-#include "instruction/Instruction.h"
-#include "instruction/InstructionFactory.h"
 
 namespace sisops {
 
@@ -18,8 +13,8 @@ ProcessManager::ProcessManager(bool b) : real_memory(real_memory_page_amount),
 
 // Checks if the id of a process has already been loaded.
 bool ProcessManager::ProcessExists(int id) {
-    for (const Process& p : processes) {
-        if (p.getId() == id) {
+    for (int i = 0; i < processes.size(); i++) {
+        if (processes[i].getId() == id) {
             return true;
         } 
     }
@@ -32,11 +27,12 @@ bool ProcessManager::ProcessExists(int id) {
 // If it is not, -1 is returned. Also, this function modifies either the fifo or lru queue.
 // Thus it must only be called once per swap.
 int ProcessManager::GetNextVictimFrameNumber() {
+    PageIdentifier victim_page;
     if (is_fifo) {
-        PageIdentifier victim_page = fifo.front();
+        victim_page = fifo.front();
         fifo.pop();
     } else {
-        PageIdentifier victim_page = lru.front();
+        victim_page = lru.front();
         lru.pop();
     }
 

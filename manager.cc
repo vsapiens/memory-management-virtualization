@@ -10,12 +10,7 @@
 #include <memory>
 #include <tuple>
 #include "process_manager/ProcessManager.h"
-#include "Reader/Reader.h"
-#include "Reader/Token.h"
-
-#include "instruction/Instruction.h"
-#include "instruction/InstructionFactory.h"
-
+#include "reader/Reader.h"
 
 // Function: Main
 // It handles the input, the process of counting the archives and the output for the program.

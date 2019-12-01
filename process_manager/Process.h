@@ -29,7 +29,6 @@ struct TableEntry {
 class Process {
  public:
     Process(int id, int size, int f_amount);
-    ~Process();
 
     int getFrameNumber(int vAddress);
     int getValid(int vAddress);

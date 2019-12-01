@@ -13,7 +13,9 @@
 #include <queue>
 
 #include "Process.h"
-#include "../Reader/Parser.h"
+#include "../PageSize.h"
+#include "../reader/Token.h"
+#include "../instruction/Instruction.h"
 #include "../instruction/InstructionFactory.h"
 
 namespace sisops{
@@ -96,7 +98,6 @@ class ProcessManager {
     void AddToQueue(PageIdentifier new_page);
  public:
     ProcessManager(bool is_fifo);
-    ~ProcessManager();
     OperationStatus DoProcess(std::vector<Token> instruction);
 };
 
