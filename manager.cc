@@ -10,8 +10,8 @@
 #include <memory>
 #include <tuple>
 #include "process_manager/ProcessManager.h"
-#include "Reader.h"
-#include "Token.h"
+#include "Reader/Reader.h"
+#include "Reader/Token.h"
 
 #include "instruction/Instruction.h"
 #include "instruction/InstructionFactory.h"
