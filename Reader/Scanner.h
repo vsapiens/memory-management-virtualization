@@ -163,6 +163,7 @@ int Scanner::filter(char c) {
         case '9':
             return 7;
         case ' ':
+        case '\t':
             return 8;
         default:
             return 6;

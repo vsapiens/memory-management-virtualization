@@ -14,10 +14,20 @@
 
 namespace sisops{
 
+struct ParseStatus {
+    bool correct;
+    std::string message;
+
+    ParseStatus() {
+        correct = true;
+        message = "";
+    }
+};
+
 class Parser {
     public:
     Parser();
-    void parseIns(std::vector<Token> tokens);
+    ParseStatus parseIns(std::vector<Token> tokens);
 
     private:
     int token_index = 0;
@@ -28,12 +38,18 @@ class Parser {
     void parseCPart(std::vector<Token> tokens);
     void parseBit(std::vector<Token> tokens);
     void parseInteger(std::vector<Token> tokens);
+
+    ParseStatus parse_status;
 };
 
-Parser::Parser(){}
+Parser::Parser() : parse_status(){}
 
-void Parser::parseIns(std::vector<Token> tokens) {
+ParseStatus Parser::parseIns(std::vector<Token> tokens) {
     token_index = 0;
+
+    parse_status.correct = true;
+    parse_status.message = "";
+
     switch(tokens[token_index].token_type) {
         case TokenType::Load:
             match(tokens, TokenType::Load);
@@ -58,15 +74,18 @@ void Parser::parseIns(std::vector<Token> tokens) {
             match(tokens, TokenType::Exit);
             break;
         default:
-            std::cerr << "Parsing error" << std::endl;
+            parse_status.correct = false;
+            parse_status.message = "Instruction must begin with an operation <P, A, L, E, F, C>";
             break;
     }
 
-    if (token_index < tokens.size()) {
-        std::cerr << "Parsing error" << std::endl;
-    } else {
-        std::cout << "Todo bien" << std::endl;
+    if (token_index < tokens.size() && parse_status.correct) {
+        parse_status.correct = false;
+        parse_status.message = "Instruction contains " + std::to_string(tokens.size()) 
+            + " element(s). Expected " + std::to_string(token_index);
     }
+
+    return parse_status;
 }
 
 void Parser::parsePPart(std::vector<Token> tokens) {
@@ -89,17 +108,42 @@ void Parser::parseCPart(std::vector<Token> tokens) {
 }
 
 void Parser::parseInteger(std::vector<Token> tokens) {
+    if (token_index >= tokens.size()) {
+        if (parse_status.correct) {
+            parse_status.correct = false;
+            parse_status.message = "Fewer elements than expected"; 
+        }
+
+        return;
+    }
+
     switch(tokens[token_index].token_type) {
         case TokenType::Integer:
-            match(tokens, TokenType::Integer);;
+            match(tokens, TokenType::Integer);
             break;
-        default:
+        case TokenType::One:
+        case TokenType::Zero:
             parseBit(tokens);
             break;
+        default:
+             if (parse_status.correct) {
+                parse_status.correct = false;
+                parse_status.message = "Expected Integer or Bit. Got " 
+                    + token_type_to_string(tokens[token_index].token_type);
+             }
     }
 }
 
 void Parser::parseBit(std::vector<Token> tokens) {
+    if (token_index >= tokens.size()) {
+        if (parse_status.correct) {
+            parse_status.correct = false;
+            parse_status.message = "Fewer elements than expected"; 
+        }
+
+        return;
+    }
+
     switch(tokens[token_index].token_type) {
         case TokenType::One:
             match(tokens, TokenType::One);;
@@ -108,18 +152,26 @@ void Parser::parseBit(std::vector<Token> tokens) {
             match(tokens, TokenType::Zero);
             break;
         default:
-            std::cerr << "Parsing error" << std::endl;
+            if (parse_status.correct) {
+                parse_status.correct = false;
+                parse_status.message = "Expected bit on last position. Got " 
+                    + token_type_to_string(tokens[token_index].token_type);
+            }
             break;
     }
 }
 
 void Parser::match(std::vector<Token> tokens, TokenType type) {
         if (token_index >= tokens.size()) {
-            std::cerr << "Parsing error" << std::endl;
+            parse_status.correct = false;
+            parse_status.message = "Instruction contains " + std::to_string(token_index) 
+            + " elements. Expected " + std::to_string(tokens.size());
         }
 
         if (tokens[token_index].token_type != type) {
-            std::cerr << "Parsring error" << std::endl;
+            parse_status.correct = false;
+            parse_status.message = "Expected" + token_type_to_string(type) + ". Got " 
+                + token_type_to_string(tokens[token_index].token_type);
         } else {
             token_index++;
         }

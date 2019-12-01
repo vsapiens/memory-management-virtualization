@@ -13,7 +13,7 @@
 #include "FreeInstruction.h"
 #include "LoadInstruction.h"
 #include "Instruction.h"
-#include "../Token.h"
+#include "../Reader/Token.h"
 
 namespace sisops {
 

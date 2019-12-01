@@ -8,9 +8,10 @@
 // Version: 1.0 last modified 14/11/2019
 #include <iostream>
 #include <memory>
+#include <tuple>
 #include "process_manager/ProcessManager.h"
-#include "Reader.h"
-#include "Token.h"
+#include "Reader/Reader.h"
+#include "Reader/Token.h"
 
 #include "instruction/Instruction.h"
 #include "instruction/InstructionFactory.h"
@@ -22,31 +23,24 @@
 // Return: Int, describing the correct compilation of the program
 int main()
 {
-    //std::vector<std::vector<sisops::Token>> tokenized_instructions = sisops::readInputFile("file.txt");
-    // std::string input;
-    // std::getline(std::cin, input);
-    // sisops::Scanner scanner;
-    // std::vector<sisops::Token> tokens = scanner.scan(input);
-    // for (const sisops::Token& token : tokens) {
-    //     std::cout << token.value << "\t" <<  sisops::token_type_to_string(token.token_type) << std::endl;
-    // }
-/*
-    std::vector<sisops::Token> tokens;
-    sisops::Token t(sisops::TokenType::Load, "P");
-    sisops::Token b(sisops::TokenType::Integer, "32");
-    sisops::Token i(sisops::TokenType::Integer, "15");
+    auto result = sisops::readAndParseInputFile("test2.txt");
+    std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
+    std::vector<sisops::Error> errors = std::get<1>(result);
 
-    tokens.push_back(t);
-    tokens.push_back(b);
-    tokens.push_back(i);
-
-    sisops::InstructionFactory insF;
-
-    std::unique_ptr<sisops::Instruction> p = insF.MakeInstruction(tokens);
-    sisops::LoadInstruction *l = dynamic_cast<sisops::LoadInstruction*>(p.get());
-    std::cout << l->getBytes() << std::endl;
-    if(p) {
-        std::cout << "smn" << std::endl;
+    if (errors.size() > 0) {
+        std::cout << "-----------------SYNTAX ERROR-----------------" << std:: endl;
+        for (const sisops::Error& e: errors) {
+            std::cout << "PARSER: Line " << e.line << ": " << e.message << std::endl;
+        }
+        exit(1);
+    } else {
+        std::cout << "PARSER: File free from errors" << std::endl;
     }
-    return 0;
+
+    sisops::ProcessManager pm(true);
+
+    for (const std::vector<sisops::Token>& tokens : token_list) {
+        sisops::OperationStatus result = pm.DoProcess(tokens);
+        std::cout << result.message << std::endl;
+    }
 }
