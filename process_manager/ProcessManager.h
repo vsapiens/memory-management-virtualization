@@ -119,7 +119,7 @@ class ProcessManager {
 
 
 ProcessManager::ProcessManager(bool b) : real_memory(REAL_MEMORY_PAGE_AMOUNT),
-    swapping_memory(SWAPPING_MEMORY_PAGE_AMOUNT), is_fifo(b), time(0.0) {}
+    swapping_memory(SWAPPING_MEMORY_PAGE_AMOUNT), is_fifo(b), time(0.0),page_faults(0),swapIn_operations(0),swapOut_operations(0),avg_turnaround(0){}
 
 // Checks if the id of a process has already been loaded.
 bool ProcessManager::ProcessExists(const int id) {
