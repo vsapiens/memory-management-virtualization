@@ -429,6 +429,8 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     int id = instruction->GetId();
     std::queue<PageIdentifier> temp;
 
+    current_status.messages_.push_back("L " + std::to_string(id));
+
     if(!ProcessExists(id)){
         current_status.success_ = false;
         current_status.critical_error_ = false;
