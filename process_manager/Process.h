@@ -35,13 +35,16 @@ class Process {
 
     int GetId();
     int GetSize();
+    double GetTime();
 
     void SetFrameNumber(int page, int frameNumber);
     void SetValid(int page, bool valid);
+    void SetTime(double time);
 
  private:
     const int id_;
     const int size_;
+    double time_;
     std::vector<TableEntry> pageTable;
 
 };
@@ -65,6 +68,10 @@ inline int Process::GetSize() {
     return size_;
 }
 
+inline double Process::GetTime() {
+    return time_;
+}
+
 inline void Process::SetFrameNumber(const int page, const int frameNumber) {
     pageTable[page].frame_number_ = frameNumber;
 }
@@ -72,6 +79,10 @@ inline void Process::SetFrameNumber(const int page, const int frameNumber) {
 
 inline void Process::SetValid(const int page, const bool valid) {
     pageTable[page].valid_ = valid;
+}
+
+inline void Process::SetTime(double time) {
+    time_ = time;
 }
 
 }
