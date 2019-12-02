@@ -341,6 +341,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         return;
     }
 
+    // Set the frames of the swapping and real memory as free if they belong to the process.
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free && swapping_memory[i].page_identifier.process_id == id) {
             swapping_memory[i].free = true;
@@ -353,10 +354,11 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         }
     }
 
+    // If they are different processes, push them into another queue.
     if (is_fifo) {
         while (!fifo.empty()) {
             if (fifo.front().process_id != id) {
-                temp.push(fifo.front()); // If they are different processes, push them into another queue.
+                temp.push(fifo.front());
             }
             
             fifo.pop();
@@ -367,7 +369,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     else {
         while (!lru.empty()) {
             if (lru.front().process_id != id) {
-                temp.push(lru.front()); // If they are different processes, push them into another queue.
+                temp.push(lru.front());
             }
             
             lru.pop();
