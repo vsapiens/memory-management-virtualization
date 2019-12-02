@@ -32,7 +32,7 @@ class Process {
     Process();
 
     int GetFrameNumber(const int page);
-    int GetValid(const int vAddress);
+    int GetValid(const int page);
 
     int GetId();
     int GetSize();
@@ -64,6 +64,10 @@ inline int Process::GetId() {
 
 inline int Process::GetSize() {
     return size_;
+}
+
+inline int Process::GetValid(const int page) {
+    return pageTable[page].valid_;
 }
 
 inline double Process::GetTime() {
