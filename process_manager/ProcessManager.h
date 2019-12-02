@@ -360,7 +360,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         return;
     }
     // Throws an error message if the address is out of range.
-    if(virtual_address < 0) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
+    if(virtual_address > 0 && processes[id].GetSize() > virtual_address) {
         current_status.success_ = false;
         current_status.critical_error_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
