@@ -234,6 +234,7 @@ void ProcessManager::InsertPage(PageIdentifier new_page) {
             real_memory[i].page_identifier_ = new_page;
             real_memory[i].free_ = false;
             new_frame_number = i;
+            break;
         }
     }
 
