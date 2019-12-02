@@ -66,6 +66,7 @@ class ProcessManager {
     std::vector<Frame> swapping_memory;
     bool is_fifo;
     double time;
+    int swap_operations;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -208,6 +209,9 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     processes.find(new_page.process_id)->second.setFrameNumber(new_page.page, victim_frame_number);
 
     AddToQueue(new_page);
+
+    swap_operations++;
+    time += 0.1;
 }
 
 // Insert a page into real memory. This function assumes that the real memory has at
@@ -233,6 +237,9 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<LoadInstruction>(current_instruction);
     int id = instruction->GetId();
     int size = instruction->GetBytes();
+
+    current_status.messages.push_back("P"); 
+    current_status.messages.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
 
     if (ProcessExists(id)) {
         current_status.success = false;
@@ -280,19 +287,28 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     int virtual_address = instruction->GetVirtualAddress();
     int option = instruction->GetOption();
 
+    current_status.messages.push_back("A"); 
+    current_status.messages.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
+
+    //If the option also writes/modifies it must declare that it does.
+    if(option == 1){
+        current_status.messages.push_back("Modifying the address given.");
+    }
+    // Throws an error message when accesing a non-existing progress
     if(!ProcessExists(id)){
         current_status.success = false;
         current_status.messages.push_back("Tried to access a non-existing process.");
         return;
     }
-    
-    if(virtual_address < 0)
+    // Throws an error message if the address is out of range
+    if(virtual_address < 0) //TODO: Also check if the page_size * the number of frames is out of range
     {
         current_status.success = false;
         current_status.messages.push_back("The virtual address given is out of the range of the processes' addresses.");
         return;
     }
     
+    //Calculates the page and displacement of the tuple v = (p,d)
     int page = std::floor(virtual_address / page_size);
     int displacement = virtual_address % page_size;
 
@@ -344,21 +360,30 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
 
 void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<CommentInstruction>(current_instruction);
-
     std::string comment = instruction->GetComment();
 
+    current_status.messages.push_back("C"); 
     current_status.success = true;
-    current_status.messages.push_back(comment);
+    current_status.messages.push_back(comment); 
+    /* TODO: The reader only reads the first word of the comment given
+            test2.txt:
+                Expected Output: archivo de prueba para FIFO, LRU
+                Given Output:    archivo 
+    */
 }
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
+
+    current_status.messages.push_back("F");
+    current_status.messages.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
+
 }
 
 void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
-    OperationStatus status;
 
+    current_status.messages.push_back("E");
     current_status.success = true;
     current_status.messages.push_back("End of instuctions.");
 }
