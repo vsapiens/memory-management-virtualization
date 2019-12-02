@@ -333,6 +333,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
     int id = instruction->GetId();
+    std::queue<PageIdentifier> temp;
 
     if(!ProcessExists(id)){
         current_status.success = false;
@@ -352,6 +353,29 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
             real_memory[i].free = true;
             //quitar el elemento del vector real_memory
         }
+    }
+
+    if (is_fifo) {
+        while (!fifo.empty()) {
+            if (fifo.front().process_id != id) {
+                temp.push(fifo.front()); // If they are different processes, push them into another queue.
+            }
+            
+            fifo.pop();
+        }
+
+        fifo = temp;
+    }
+    else {
+        while (!lru.empty()) {
+            if (lru.front().process_id != id) {
+                temp.push(lru.front()); // If they are different processes, push them into another queue.
+            }
+            
+            lru.pop();
+        }
+
+        lru = temp;
     }
 
     current_status.success = true;
