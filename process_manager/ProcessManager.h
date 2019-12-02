@@ -210,8 +210,11 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     swapping_memory[swapping_frame_number].page_identifier_ = real_memory[victim_frame_number].page_identifier_;
     real_memory[victim_frame_number].page_identifier_ = new_page;
 
+
     int victim_pid = swapping_memory[swapping_frame_number].page_identifier_.process_id_;
-    int victim_page = swapping_memory[swapping_frame_number].page_identifier_.process_id_;
+    int victim_page = swapping_memory[swapping_frame_number].page_identifier_.page_;
+
+    current_status.messages_.push_back("Swapped out process " + std::to_string(victim_pid) + ", page " + std::to_string(victim_page) + " into swapping memory");
 
     processes.find(victim_pid)->second.SetValid(victim_page, false);
 
@@ -376,10 +379,10 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     int page = std::floor(virtual_address / PAGE_SIZE);
     int displacement = virtual_address % PAGE_SIZE;
 
+    PageIdentifier p(id, page);
     // Check if page is not in real memory
     if (!processes.find(id)->second.GetValid(page)) {
         // If it is not, then find its address in the swapping memory
-        PageIdentifier p(id, page);
         int swapping_frame = FindFrameNumberSwap(p);
         // Then set it to free
         swapping_memory[swapping_frame].free_ = true;
@@ -398,20 +401,19 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     // If the algorithm is LRU, finds the process being accessed and stores it in a temporal variable.
     if (!is_fifo) {
         while (!lru.empty()) {
-            if (lru.front().process_id_ != id) {
-                tempQ.push(lru.front());
+            if (lru.front() == p) {
+                tempP = lru.front();
             }
             else {
-                tempP = lru.front();
+                tempQ.push(lru.front());
             }
             
             lru.pop();
         }
+        // Copies the queue without the process that is being access and inserts the process at the end of the queue.
+        lru = tempQ;
+        lru.push(tempP);
     }
-
-    // Copies the queue without the process that is being access and inserts the process at the end of the queue.
-    lru = tempQ;
-    lru.push(tempP);
 
     current_status.success_ = true;
     current_status.critical_error_ = false;

@@ -41,7 +41,7 @@ int main()
         std::cout << "PARSER: File free from errors" << std::endl;
     }
 
-    sisops::ProcessManager pm(true);
+    sisops::ProcessManager pm(false);
 
     // Process each instruction.
     for (int i = 0; i < token_list.size(); i++) {
@@ -49,6 +49,7 @@ int main()
         for (const std::string& message : result.messages_) {
             std::cout << message << std::endl;
         }
+        std::cout << std::endl;
         if (result.critical_error_) {
             std::cout << "-----------CRITICAL ERROR------------" << std::endl;
             int finalize_position = GetNextFinalize(token_list, i);
