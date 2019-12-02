@@ -30,7 +30,7 @@ class Process {
  public:
     Process(const int id, const int size, const int f_amount);
 
-    int GetFrameNumber(const int vAddress);
+    int GetFrameNumber(const int page);
     int GetValid(const int vAddress);
 
     int GetId();
@@ -52,12 +52,8 @@ class Process {
 
 Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount), time_(0){}
 
-inline int Process::GetFrameNumber(const int vAddress) {
-    return pageTable[vAddress / size_].frame_number_;
-}
-
-inline int Process::GetValid(const int vAddress) {
-    return pageTable[vAddress / size_].valid_;
+inline int Process::GetFrameNumber(const int page) {
+    return pageTable[page].frame_number_;
 }
 
 inline int Process::GetId() {

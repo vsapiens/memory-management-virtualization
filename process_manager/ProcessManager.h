@@ -238,6 +238,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<LoadInstruction>(current_instruction);
     int id = instruction->GetId();
     int size = instruction->GetBytes();
+    std::string pages_used = "";
 
     if (ProcessExists(id)) {
         current_status.success_ = false;
@@ -280,8 +281,11 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         } else {
             InsertPage(new_page);
         }
+        pages_used = pages_used + std::to_string(processes[id].GetFrameNumber(i)) + ", ";
     }
 
+    current_status.messages_.push_back("Pages used in the loading of this process:");
+    current_status.messages_.push_back(pages_used);
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
