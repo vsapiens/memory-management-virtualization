@@ -60,7 +60,7 @@ class ProcessManager {
  private:
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
-    std::unordered_map<int, Process> processes; // Consider changing this to a map for constant access.
+    std::unordered_map<int, Process> processes;
     InstructionFactory factory;
     std::vector<Frame> real_memory;
     std::vector<Frame> swapping_memory;
@@ -389,11 +389,6 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
     current_status.messages_.push_back("C"); 
     current_status.success_ = true;
     current_status.messages_.push_back(comment); 
-    /* TODO: The reader only reads the first word of the comment given
-            test2.txt:
-                Expected Output: archivo de prueba para FIFO, LRU
-                Given Output:    archivo 
-    */
 }
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
@@ -416,7 +411,7 @@ OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
     TokenType token_type = instruction[0].token_type;
     std::shared_ptr<Instruction> current_instruction = factory.MakeInstruction(instruction);
     
-    // Reset current status for new operation
+    // Reset current status for new operation.
     current_status.success_ = true;
     current_status.messages_.clear();
 
