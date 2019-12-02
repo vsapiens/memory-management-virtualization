@@ -24,10 +24,12 @@ namespace sisops{
 
 struct OperationStatus {
     bool success_;
+    bool critical_error_;
     std::vector<std::string> messages_;
 
     OperationStatus() {
         success_ = true;
+        critical_error_ = false;
     }
 };
 
@@ -66,7 +68,8 @@ class ProcessManager {
     std::vector<Frame> swapping_memory;
     bool is_fifo;
     double time;
-    int swap_operations;
+    int swapIn_operations;
+    int swapOut_operations;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -94,7 +97,7 @@ class ProcessManager {
     bool RealMemoryFull();
     // Checks whether all of the swapping memory's pages have already been used.
     bool SwappingMemoryFull();
-    // Swaps an existing page with the current page and returns the page's new frame number 
+    // Swaps an existing page with the current page and returns the page's new frame number.
     void SwapPage(PageIdentifier new_page); 
 
     void InsertPage(PageIdentifier new_page);
@@ -192,7 +195,7 @@ int ProcessManager::FindFrameNumberSwap(PageIdentifier p) {
     return -1;
 }
 
-// Swaps an existing page with the current page and returns the page's new frame number 
+// Swaps an existing page with the current page and returns the page's new frame number.
 void ProcessManager::SwapPage(PageIdentifier new_page) {
     int victim_frame_number = GetNextVictimFrameNumber();
     int swapping_frame_number = GetFreeSwappingFrame();
@@ -209,8 +212,6 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, victim_frame_number);
 
     AddToQueue(new_page);
-
-    swap_operations++;
     time += 0.1;
 }
 
@@ -240,12 +241,14 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
 
     if (ProcessExists(id)) {
         current_status.success_ = false;
-        current_status.messages_.push_back("Tried to load existent process");
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("ERROR: Tried to load existent process");
         return;
     }
 
     if (size > REAL_MEMORY_SIZE) {
         current_status.success_ = false;
+        current_status.critical_error_ = true;
         current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
@@ -258,6 +261,8 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     Process p(id, size, frame_amount);
     processes.insert(std::make_pair(id, p));
 
+    processes[id].SetTime(time);
+    
     // We insert a new page for each frame amount, starting the page's id at 0 until
     // frame_amount - 1.
     for (int i = 0; i < frame_amount; i++) {
@@ -267,6 +272,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
             // full so there is no space to swap anymore.
             if (SwappingMemoryFull()) {
                 current_status.success_ = false;
+                current_status.critical_error_ = true;
                 current_status.messages_.push_back("Real memory and swapping memory full");
                 return;
             }
@@ -277,11 +283,11 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     }
 
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
 }
 
 void ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
-
     auto instruction = std::dynamic_pointer_cast<AccessInstruction>(current_instruction);
     int id = instruction->GetId();
     int virtual_address = instruction->GetVirtualAddress();
@@ -291,19 +297,20 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     current_status.messages_.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
 
     //If the option also writes/modifies it must declare that it does.
-    if(option == 1){
+    if(option == 1) {
         current_status.messages_.push_back("Modifying the address given.");
     }
-    // Throws an error message when accesing a non-existing progress
+    // Throws an error message when accesing a non-existing progress.
     if(!ProcessExists(id)){
         current_status.success_ = false;
-        current_status.messages_.push_back("Tried to access a non-existing process.");
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("ERROR: Tried to access a non-existing process.");
         return;
     }
-    // Throws an error message if the address is out of range
-    if(virtual_address < 0) //TODO: Also check if the PAGE_SIZE * the number of frames is out of range
-    {
+    // Throws an error message if the address is out of range.
+    if(virtual_address < 0) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
         current_status.success_ = false;
+        current_status.critical_error_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
         return;
     }
@@ -326,7 +333,29 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         // Page in memory, so no operation is needed
     }
 
+    std::queue<PageIdentifier> tempQ; // Queue to save the pages that have different id to the process id being accessed.
+    PageIdentifier tempP; // Temporal variable to save the process that is being accesed.
+
+    // If the algorithm is LRU, finds the process being accessed and stores it in a temporal variable.
+    if (!is_fifo) {
+        while (!lru.empty()) {
+            if (lru.front().process_id_ != id) {
+                tempQ.push(lru.front());
+            }
+            else {
+                tempP = lru.front();
+            }
+            
+            lru.pop();
+        }
+    }
+
+    // Copies the queue without the process that is being access and inserts the process at the end of the queue.
+    lru = tempQ;
+    lru.push(tempP);
+
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 }
 
@@ -337,6 +366,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
 
     if(!ProcessExists(id)){
         current_status.success_ = false;
+        current_status.critical_error_ = false;
         current_status.messages_.push_back("Tried to free a non-existing process.");
         return;
     }
@@ -379,6 +409,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     }
 
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
 }
 
@@ -387,15 +418,22 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
     std::string comment = instruction->GetComment();
 
     current_status.messages_.push_back("C"); 
-    current_status.success_ = true;
     current_status.messages_.push_back(comment); 
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
+    /* TODO: The reader only reads the first word of the comment given.
+            test2.txt:
+                Expected Output: archivo de prueba para FIFO, LRU
+                Given Output:    archivo 
+    */
 }
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
     current_status.messages_.push_back("F");
-    current_status.messages_.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
+    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
+    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
 }
 
@@ -403,8 +441,9 @@ void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
     current_status.messages_.push_back("E");
-    current_status.success_ = true;
     current_status.messages_.push_back("End of instuctions.");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
 }
 
 OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {

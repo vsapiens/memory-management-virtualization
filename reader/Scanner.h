@@ -16,7 +16,6 @@ namespace sisops{
 class Scanner {
     public:
     Scanner();
-    //~Scanner();
 
     std::vector<Token> scan(std::string str);
 
@@ -50,7 +49,7 @@ int Scanner::getEndWord(std::string s, int init) {
 }
 
 std::vector<Token> Scanner::scan(std::string str) {
-    str += " "; // Agregamos esto para que pueda leer el ultimo token
+    str += " "; // We added this so the last token is read.
     char c;
     int state = 0, index = 0;
     std::string value = "";
@@ -62,10 +61,8 @@ std::vector<Token> Scanner::scan(std::string str) {
         value = "";
         do {
             c = str[index];
-            //std::cout << c << " state:" << state;
             index++;
             state = transition_matrix[state][filter(c)];
-            //std::cout << "  New state:" << state << std::endl;
             if (state != 0) {
                 value += c;
             }

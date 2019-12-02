@@ -12,6 +12,15 @@
 #include "process_manager/ProcessManager.h"
 #include "reader/Reader.h"
 
+int GetNextFinalize(std::vector<std::vector<sisops::Token>> token_list, int init) {
+    int i = init;
+    while (token_list[i][0].token_type != sisops::TokenType::Finalize) {
+        i++;
+    }
+
+    return i;
+}
+
 // Function: Main
 // It handles the input, the process of counting the archives and the output for the program.
 // Parameters: -
@@ -34,10 +43,19 @@ int main()
 
     sisops::ProcessManager pm(true);
 
-    for (const std::vector<sisops::Token>& tokens : token_list) {
-        sisops::OperationStatus result = pm.DoProcess(tokens);
+    // Process each instruction.
+    for (int i = 0; i < token_list.size(); i++) {
+        sisops::OperationStatus result = pm.DoProcess(token_list[i]);
         for (const std::string& message : result.messages_) {
             std::cout << message << std::endl;
+        }
+        if (result.critical_error_) {
+            std::cout << "-----------CRITICAL ERROR------------" << std::endl;
+            int finalize_position = GetNextFinalize(token_list, i);
+            i = finalize_position;
+            pm.DoProcess(token_list[i]);
+        } else { 
+            // Nothing.
         }
     }
 }
