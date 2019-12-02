@@ -296,8 +296,17 @@ OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> curren
         status.message = "Tried to access a non-existing process.";
         return status;
     }
+    
+    if(virtual_address < 0)
+    {
+        status.success = false;
+        status.message = "The virtual address given is out of the range of the processes' addresses.";
+        return status;
+    }
+    
 
-
+    int page = std::floor(virtual_address / page_size);
+    int displacement = (int)( virtual_address/ page_size) * page_size;
 
 }
 OperationStatus ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
@@ -305,12 +314,26 @@ OperationStatus ProcessManager::Free(const std::shared_ptr<Instruction> current_
 }
 OperationStatus ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<CommentInstruction>(current_instruction);
+
+    std::string comment = instruction->GetComment();
+    OperationStatus status;
+
+    status.success = true;
+    status.message = comment;
+
+    return status;
 }
 OperationStatus ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 }
 OperationStatus ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
+    OperationStatus status;
+
+    status.success = true;
+    status.message = "End of instuctions."
+    
+    return status;
 }
 OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
     TokenType token_type = instruction[0].token_type;
