@@ -434,6 +434,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     }
 
     turnarounds.push_back(std::make_pair(id, time - processes[id].GetTime()));
+    processes.erase(id);
 
     current_status.success_ = true;
     current_status.critical_error_ = false;
@@ -459,15 +460,14 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
     std::unordered_map<int, Process>::iterator it;
 
-    for(it = processes.begin(); it != processes.end();it++)
-    {
+    for(it = processes.begin(); it != processes.end();it++) {
         turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
     }
 
     current_status.messages_.push_back("F");
     current_status.messages_.push_back("Turnarounds of Processes: ");
-    for(int i = 0; i < turnarounds.size(); i++)
-    {
+
+    for(int i = 0; i < turnarounds.size(); i++) {
         current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
     }
 
