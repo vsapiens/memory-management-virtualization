@@ -261,6 +261,8 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     Process p(id, size, frame_amount);
     processes.insert(std::make_pair(id, p));
 
+    processes[id].SetTime(time);
+    
     // We insert a new page for each frame amount, starting the page's id at 0 until
     // frame_amount - 1.
     for (int i = 0; i < frame_amount; i++) {
