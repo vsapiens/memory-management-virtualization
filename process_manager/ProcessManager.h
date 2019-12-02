@@ -339,7 +339,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     // If the algorithm is LRU, finds the process being accessed and stores it in a temporal variable.
     if (!is_fifo) {
         while (!lru.empty()) {
-            if (lru.front().process_id != id) {
+            if (lru.front().process_id_ != id) {
                 tempQ.push(lru.front());
             }
             else {
