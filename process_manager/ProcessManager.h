@@ -213,6 +213,7 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
 
     AddToQueue(new_page);
     time += 0.1;
+    swapOut_operations++;
 }
 
 // Insert a page into real memory. This function assumes that the real memory has at
@@ -262,7 +263,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     processes.insert(std::make_pair(id, p));
 
     processes[id].SetTime(time);
-    
+
     // We insert a new page for each frame amount, starting the page's id at 0 until
     // frame_amount - 1.
     for (int i = 0; i < frame_amount; i++) {
@@ -328,6 +329,8 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         int swapping_frame = FindFrameNumberSwap(p);
         // Then set it to free
         swapping_memory[swapping_frame].free_ = true;
+        swapIn_operations++;
+        time += 0.1;
         // Now call SwapPage, which will automatically choose a page from real memory
         // to swap and will insert the new page
         SwapPage(p);
