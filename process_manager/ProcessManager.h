@@ -99,6 +99,8 @@ class ProcessManager {
     void InsertPage(PageIdentifier new_page);
 
     void AddToQueue(PageIdentifier new_page);
+
+    int FindFrameNumberSwap(PageIdentifier p);
  public:
     ProcessManager(bool is_fifo);
     OperationStatus DoProcess(std::vector<Token> instruction);
@@ -177,6 +179,16 @@ void ProcessManager::AddToQueue(PageIdentifier new_page) {
     } else {
         lru.push(new_page);
     }
+}
+
+int ProcessManager::FindFrameNumberSwap(PageIdentifier p) {
+    for (int i = 0; i < swapping_memory.size(); i++) {
+        if (swapping_memory[i].page_identifier == p) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 // Swaps an existing page with the current page and returns the page's new frame number 
@@ -284,8 +296,22 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     int page = std::floor(virtual_address / page_size);
     int displacement = virtual_address % page_size;
 
+    // Check if page is not in real memory
+    if (!processes.find(id)->second.getValid(page)) {
+        // If it is not, then find its address in the swapping memory
+        PageIdentifier p(id, page);
+        int swapping_frame = FindFrameNumberSwap(p);
+        // Then set it to free
+        swapping_memory[swapping_frame].free = true;
+        // Now call SwapPage, which will automatically choose a page from real memory
+        // to swap and will insert the new page
+        SwapPage(p);
+    } else {
+        // Page in memory, so no operation is needed
+    }
+
     current_status.success = true;
-    current_status.messages.push_back("Real Memory Address " + std::to_string(virtual_address) + " = " + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
+    current_status.messages.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 }
 
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
