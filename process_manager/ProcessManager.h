@@ -333,6 +333,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
     int id = instruction->GetId();
+    std::queue<PageIdentifier> temp;
 
     if(!ProcessExists(id)){
         current_status.success = false;
@@ -343,15 +344,36 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free && swapping_memory[i].page_identifier.process_id == id) {
             swapping_memory[i].free = true;
-            //quitarlo el elemento del vector swapping_memory
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free && real_memory[i].page_identifier.process_id == id) {
             real_memory[i].free = true;
-            //quitar el elemento del vector real_memory
         }
+    }
+
+    if (is_fifo) {
+        while (!fifo.empty()) {
+            if (fifo.front().process_id != id) {
+                temp.push(fifo.front()); // If they are different processes, push them into another queue.
+            }
+            
+            fifo.pop();
+        }
+
+        fifo = temp;
+    }
+    else {
+        while (!lru.empty()) {
+            if (lru.front().process_id != id) {
+                temp.push(lru.front()); // If they are different processes, push them into another queue.
+            }
+            
+            lru.pop();
+        }
+
+        lru = temp;
     }
 
     current_status.success = true;
