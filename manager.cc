@@ -43,7 +43,7 @@ int main()
 
     sisops::ProcessManager pm(true);
 
-    // Process each instruction 
+    // Process each instruction.
     for (int i = 0; i < token_list.size(); i++) {
         sisops::OperationStatus result = pm.DoProcess(token_list[i]);
         for (const std::string& message : result.messages_) {
@@ -55,7 +55,7 @@ int main()
             i = finalize_position;
             pm.DoProcess(token_list[i]);
         } else { 
-            // Nothing
+            // Nothing.
         }
     }
 }
