@@ -108,6 +108,8 @@ class ProcessManager {
     void AddToQueue(PageIdentifier new_page);
 
     int FindFrameNumberSwap(PageIdentifier p);
+
+    void Reset();
  public:
     ProcessManager(bool is_fifo);
     OperationStatus DoProcess(std::vector<Token> instruction);
@@ -236,6 +238,21 @@ void ProcessManager::InsertPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, new_frame_number);
 
     AddToQueue(new_page);
+}
+
+void ProcessManager::Reset() {
+    while (!fifo.empty()) {
+        fifo.pop();
+    }
+    while (!lru.empty()) {
+        lru.pop();
+    }
+    std::vector<Frame> real_memory.clear();
+    std::vector<Frame> swapping_memory.clear();
+
+    time = 0.0;
+    swapIn_operations = 0;
+    swapOut_operations = 0;
 }
 
 void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction) {
@@ -458,6 +475,7 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
     current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
+    Reset();
 }
 
 void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction) {
