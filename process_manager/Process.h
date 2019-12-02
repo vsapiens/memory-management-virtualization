@@ -14,64 +14,75 @@
 namespace sisops {
 
 struct TableEntry {
-    int frameNumber;
-    bool valid;
+    int frame_number_;
+    bool valid_;
     TableEntry() {
-        frameNumber = -1;
-        valid = false;
+        frame_number_ = -1;
+        valid_ = false;
     }
-    TableEntry(int frame, bool v) {
-        frameNumber = frame;
-        valid = v;
+    TableEntry(const int frame, const bool v) {
+        frame_number_ = frame;
+        valid_ = v;
     }
 };
 
 class Process {
  public:
-    Process(int id, int size, int f_amount);
+    Process(const int id, const int size, const int f_amount);
 
-    int getFrameNumber(int vAddress);
-    int getValid(int vAddress);
+    int GetFrameNumber(const int vAddress);
+    int GetValid(const int vAddress);
 
-    int getId();
-    int getSize();
+    int GetId();
+    int GetSize();
+    double GetTime();
 
-    void setFrameNumber(int page, int frameNumber);
-    void setValid(int page, bool valid);
+    void SetFrameNumber(int page, int frameNumber);
+    void SetValid(int page, bool valid);
+    void SetTime(double time);
 
  private:
     const int id_;
     const int size_;
+    double time_;
     std::vector<TableEntry> pageTable;
 
 };
 
 
-Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount){}
+Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount), time_(0){}
 
-inline int Process::getFrameNumber(const int vAddress) {
-    return pageTable[vAddress / size_].frameNumber;
+inline int Process::GetFrameNumber(const int vAddress) {
+    return pageTable[vAddress / size_].frame_number_;
 }
 
-inline int Process::getValid(const int vAddress) {
-    return pageTable[vAddress / size_].valid;
+inline int Process::GetValid(const int vAddress) {
+    return pageTable[vAddress / size_].valid_;
 }
 
-inline int Process::getId() {
+inline int Process::GetId() {
     return id_;
 }
 
-inline int Process::getSize() {
+inline int Process::GetSize() {
     return size_;
 }
 
-inline void Process::setFrameNumber(const int page, const int frameNumber) {
-    pageTable[page].frameNumber = frameNumber;
+inline double Process::GetTime() {
+    return time_;
+}
+
+inline void Process::SetFrameNumber(const int page, const int frameNumber) {
+    pageTable[page].frame_number_ = frameNumber;
 }
 
 
-inline void Process::setValid(const int page, const bool valid) {
-    pageTable[page].valid = valid;
+inline void Process::SetValid(const int page, const bool valid) {
+    pageTable[page].valid_ = valid;
+}
+
+inline void Process::SetTime(double time) {
+    time_ = time;
 }
 
 }
