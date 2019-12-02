@@ -27,7 +27,7 @@ int GetNextFinalize(std::vector<std::vector<sisops::Token>> token_list, int init
 // Return: Int, describing the correct compilation of the program
 int main()
 {
-    auto result = sisops::readAndParseInputFile("test2.txt");
+    auto result = sisops::readAndParseInputFile("test.txt");
     std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
     std::vector<sisops::Error> errors = std::get<1>(result);
 
