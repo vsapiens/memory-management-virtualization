@@ -210,8 +210,6 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, victim_frame_number);
 
     AddToQueue(new_page);
-
-    swap_operations++;
     time += 0.1;
 }
 
