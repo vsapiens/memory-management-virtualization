@@ -62,13 +62,14 @@ class ProcessManager {
  private:
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
-    std::unordered_map<int, Process> processes; // Consider changing this to a map for constant access.
+    std::unordered_map<int, Process> processes;
     InstructionFactory factory;
     std::vector<Frame> real_memory;
     std::vector<Frame> swapping_memory;
     bool is_fifo;
     double time;
-    int swap_operations;
+    int swapIn_operations;
+    int swapOut_operations;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -83,7 +84,7 @@ class ProcessManager {
     // Exits the program.
     void Exit(const std::shared_ptr<Instruction> current_instruction);
     // Checks if the id of a process has already been loaded.
-    bool ProcessExists(int id);
+    bool ProcessExists(const int id);
     // Gets the frame number of the next process in line, whether it's fifo or lru. This
     // function asumes that the page returned by either fifo or lru is indeed in real memory.
     // If it is not, -1 is returned.
@@ -92,9 +93,9 @@ class ProcessManager {
     // free spaces exist in the swapping memory using SwappingMemoryFull. It will return -1
     // otherwise.
     int GetFreeSwappingFrame();
-    // Checks whether all of the real memory's pages have already been used 
+    // Checks whether all of the real memory's pages have already been used.
     bool RealMemoryFull();
-    // Checks whether all of the swapping memory's pages have already been used 
+    // Checks whether all of the swapping memory's pages have already been used.
     bool SwappingMemoryFull();
     // Swaps an existing page with the current page and returns the page's new frame number 
     void SwapPage(PageIdentifier new_page); 
@@ -114,7 +115,7 @@ ProcessManager::ProcessManager(bool b) : real_memory(REAL_MEMORY_PAGE_AMOUNT),
     swapping_memory(SWAPPING_MEMORY_PAGE_AMOUNT), is_fifo(b), time(0.0) {}
 
 // Checks if the id of a process has already been loaded.
-bool ProcessManager::ProcessExists(int id) {
+bool ProcessManager::ProcessExists(const int id) {
     return processes.find(id) != processes.end();
 }
 
@@ -154,7 +155,7 @@ int ProcessManager::GetFreeSwappingFrame() {
     return -1;
 }
 
-// Checks whether all of the real memory's pages have already been used 
+// Checks whether all of the real memory's pages have already been used.
 bool ProcessManager::RealMemoryFull() {
     for (const Frame &f : real_memory) {
         if (f.free_) {
@@ -165,7 +166,7 @@ bool ProcessManager::RealMemoryFull() {
     return true;
 }
 
-// Checks whether all of the swapping memory's pages have already been used 
+// Checks whether all of the swapping memory's pages have already been used.
 bool ProcessManager::SwappingMemoryFull() {
     for (const Frame &f : swapping_memory) {
         if (f.free_) {
@@ -412,7 +413,8 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
     current_status.messages_.push_back("F");
-    current_status.messages_.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
+    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
+    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
 }
 
@@ -429,7 +431,7 @@ OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
     TokenType token_type = instruction[0].token_type;
     std::shared_ptr<Instruction> current_instruction = factory.MakeInstruction(instruction);
     
-    // Reset current status for new operation
+    // Reset current status for new operation.
     current_status.success_ = true;
     current_status.messages_.clear();
 
