@@ -478,15 +478,9 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
     auto instruction = std::dynamic_pointer_cast<CommentInstruction>(current_instruction);
     std::string comment = instruction->GetComment();
 
-    current_status.messages_.push_back("C"); 
     current_status.messages_.push_back(comment); 
     current_status.success_ = true;
     current_status.critical_error_ = false;
-    /* TODO: The reader only reads the first word of the comment given.
-            test2.txt:
-                Expected Output: archivo de prueba para FIFO, LRU
-                Given Output:    archivo 
-    */
 }
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
