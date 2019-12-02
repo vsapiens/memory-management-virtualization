@@ -72,7 +72,7 @@ class ProcessManager {
     int swapIn_operations;
     int swapOut_operations;
     int page_faults;
-    int avg_turnaround;
+    double avg_turnaround;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -260,7 +260,7 @@ void ProcessManager::Reset() {
     time = 0.0;
     swapIn_operations = 0;
     swapOut_operations = 0;
-    avg_turnaround = 0;
+    avg_turnaround = 0.0;
     page_faults = 0;
 
     turnarounds.clear(); 
@@ -276,11 +276,14 @@ void ProcessManager::OutputMetrics() {
     current_status.messages_.push_back("Turnarounds of Processes: ");
 
     for(int i = 0; i < turnarounds.size(); i++) {
-        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
+        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "  Turnaround Time: " + std::to_string(turnarounds[i].second));
         avg_turnaround += turnarounds[i].second;
     }
-    avg_turnaround /= (double) turnarounds.size();
-    current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
+
+    if(turnarounds.size() != 0)
+        avg_turnaround /= (double) turnarounds.size();
+
+    current_status.messages_.push_back("Average Turnaround: " + std::to_string(avg_turnaround));
     current_status.messages_.push_back("Page Faults: " + std::to_string(page_faults));
     current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
     current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
@@ -339,6 +342,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
 
     current_status.messages_.push_back("Pages used in the loading of this process:");
     current_status.messages_.push_back(pages_used);
+    time += 1;
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
@@ -434,12 +438,14 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
             swapping_memory[i].free_ = true;
+            time += 0.1;
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free_ && real_memory[i].page_identifier_.process_id_ == id) {
             real_memory[i].free_ = true;
+            time += 0.1;
         }
     }
 
@@ -489,7 +495,6 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
 
     current_status.messages_.push_back("F");
     OutputMetrics();
-
     Reset();
 }
 
@@ -497,7 +502,6 @@ void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
     current_status.messages_.push_back("E");
-    OutputMetrics();
     current_status.messages_.push_back("End of instuctions.");
     current_status.success_ = true;
     current_status.critical_error_ = false;
