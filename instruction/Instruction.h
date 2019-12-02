@@ -39,6 +39,9 @@ InstructionType Instruction::GetInstructionType(const std::string& type) {
     if(type == "E") {
         return InstructionType::Exit;
     }
+    //TODO: Verify warning
+    // ./process_manager/../instruction/Instruction.h:42:1: warning: control may reach end of non-void function [-Wreturn-type]
+    // }
 }
 
 }
