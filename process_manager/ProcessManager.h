@@ -100,7 +100,7 @@ class ProcessManager {
     bool RealMemoryFull();
     // Checks whether all of the swapping memory's pages have already been used.
     bool SwappingMemoryFull();
-    // Swaps an existing page with the current page and returns the page's new frame number 
+    // Swaps an existing page with the current page and returns the page's new frame number.
     void SwapPage(PageIdentifier new_page); 
 
     void InsertPage(PageIdentifier new_page);
@@ -202,7 +202,7 @@ int ProcessManager::FindFrameNumberSwap(PageIdentifier p) {
     return -1;
 }
 
-// Swaps an existing page with the current page and returns the page's new frame number 
+// Swaps an existing page with the current page and returns the page's new frame number.
 void ProcessManager::SwapPage(PageIdentifier new_page) {
     int victim_frame_number = GetNextVictimFrameNumber();
     int swapping_frame_number = GetFreeSwappingFrame();
@@ -291,9 +291,6 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     int id = instruction->GetId();
     int size = instruction->GetBytes();
 
-    current_status.messages_.push_back("P"); 
-    current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
-
     if (ProcessExists(id)) {
         current_status.success_ = false;
         current_status.critical_error_ = false;
@@ -307,6 +304,9 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
+
+    current_status.messages_.push_back("P " + std::to_string(size) + " " + std::to_string(id)); 
+    current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
 
     int frame_amount = (int) ceil( (double) size / (double) PAGE_SIZE);
 
@@ -340,7 +340,6 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
 }
 
 void ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
-
     auto instruction = std::dynamic_pointer_cast<AccessInstruction>(current_instruction);
     int id = instruction->GetId();
     int virtual_address = instruction->GetVirtualAddress();
@@ -350,19 +349,18 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     current_status.messages_.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
 
     //If the option also writes/modifies it must declare that it does.
-    if(option == 1){
+    if(option == 1) {
         current_status.messages_.push_back("Modifying the address given.");
     }
-    // Throws an error message when accesing a non-existing progress
+    // Throws an error message when accesing a non-existing progress.
     if(!ProcessExists(id)){
         current_status.success_ = false;
         current_status.critical_error_ = false;
         current_status.messages_.push_back("ERROR: Tried to access a non-existing process.");
         return;
     }
-    // Throws an error message if the address is out of range
-    if(virtual_address < 0) //TODO: Also check if the PAGE_SIZE * the number of frames is out of range
-    {
+    // Throws an error message if the address is out of range.
+    if(virtual_address < 0) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
         current_status.success_ = false;
         current_status.critical_error_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
@@ -480,7 +478,7 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
     current_status.messages_.push_back(comment); 
     current_status.success_ = true;
     current_status.critical_error_ = false;
-    /* TODO: The reader only reads the first word of the comment given
+    /* TODO: The reader only reads the first word of the comment given.
             test2.txt:
                 Expected Output: archivo de prueba para FIFO, LRU
                 Given Output:    archivo 
