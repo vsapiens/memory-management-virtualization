@@ -333,6 +333,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
     int id = instruction->GetId();
+    std::queue<PageIdentifier> temp;
 
     if(!ProcessExists(id)){
         current_status.success = false;
@@ -340,22 +341,45 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         return;
     }
 
+    // Set the frames of the swapping and real memory as free if they belong to the process.
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free && swapping_memory[i].page_identifier.process_id == id) {
             swapping_memory[i].free = true;
-            //quitarlo el elemento del vector swapping_memory
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free && real_memory[i].page_identifier.process_id == id) {
             real_memory[i].free = true;
-            //quitar el elemento del vector real_memory
         }
     }
 
+    // If they are different processes, push them into another queue.
+    if (is_fifo) {
+        while (!fifo.empty()) {
+            if (fifo.front().process_id != id) {
+                temp.push(fifo.front());
+            }
+            
+            fifo.pop();
+        }
+
+        fifo = temp;
+    }
+    else {
+        while (!lru.empty()) {
+            if (lru.front().process_id != id) {
+                temp.push(lru.front());
+            }
+            
+            lru.pop();
+        }
+
+        lru = temp;
+    }
+
     current_status.success = true;
-    current_status.messages.push_back("The pages of the process are available for other operations.");
+    current_status.messages.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
 }
 
 void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruction) {

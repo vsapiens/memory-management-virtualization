@@ -34,7 +34,11 @@ std::shared_ptr<Instruction> InstructionFactory::MakeInstruction(const std::vect
             return std::make_shared<FreeInstruction>(tokens[0].value, tokens[1].value);
         }
         case TokenType::Comment: {
-            return std::make_shared<CommentInstruction>(tokens[0].value, tokens[1].value);
+            std::string comment = "";
+            for (const Token& t : tokens) {
+                comment += (t.value + " ");
+            }
+            return std::make_shared<CommentInstruction>(tokens[0].value, comment);
         }
         case TokenType::Finalize: {
             return std::make_shared<FinalizeInstruction>(tokens[0].value);
