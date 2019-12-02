@@ -350,7 +350,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     int virtual_address = instruction->GetVirtualAddress();
     int option = instruction->GetOption();
 
-    current_status.messages_.push_back("A"); 
+    current_status.messages_.push_back("A " + std::to_string(virtual_address) + " " + std::to_string(id) + " " + std::to_string(option)); 
     current_status.messages_.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
 
     //If the option also writes/modifies it must declare that it does.
