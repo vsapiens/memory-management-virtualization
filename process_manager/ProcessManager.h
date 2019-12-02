@@ -238,9 +238,6 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     int id = instruction->GetId();
     int size = instruction->GetBytes();
 
-    current_status.messages_.push_back("P"); 
-    current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
-
     if (ProcessExists(id)) {
         current_status.success_ = false;
         current_status.messages_.push_back("Tried to load existent process");
@@ -252,6 +249,9 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
+
+    current_status.messages_.push_back("P " + std::to_string(size) + " " + std::to_string(id)); 
+    current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
 
     int frame_amount = (int) ceil( (double) size / (double) PAGE_SIZE);
 
