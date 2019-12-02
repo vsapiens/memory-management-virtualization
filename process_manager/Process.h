@@ -50,7 +50,7 @@ class Process {
 };
 
 
-Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount){}
+Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount), time_(0){}
 
 inline int Process::GetFrameNumber(const int vAddress) {
     return pageTable[vAddress / size_].frame_number_;
