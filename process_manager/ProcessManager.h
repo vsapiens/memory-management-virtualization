@@ -23,38 +23,38 @@
 namespace sisops{
 
 struct OperationStatus {
-    bool success;
-    bool critical_error;
-    std::vector<std::string> messages;
+    bool success_;
+    bool critical_error_;
+    std::vector<std::string> messages_;
 
     OperationStatus() {
-        success = true;
-        critical_error = false;
+        success_ = true;
+        critical_error_ = false;
     }
 };
 
 struct PageIdentifier{
-    int process_id;
-    int page;
-    PageIdentifier(const int process,const int page_id):process_id(process),page(page_id){};
-    PageIdentifier():process_id(-1),page(-1){};
+    int process_id_;
+    int page_;
+    PageIdentifier(const int process,const int page_id):process_id_(process),page_(page_id){};
+    PageIdentifier():process_id_(-1),page_(-1){};
 
-    void operator = (const PageIdentifier &p) { 
-        this->process_id = p.process_id;
-        this->page = p.page;
+    void operator = (const PageIdentifier& p) { 
+        this->process_id_ = p.process_id_;
+        this->page_ = p.page_;
     }
 
     bool operator == (const PageIdentifier& p) {
-        return this->process_id == p.process_id && this->page == p.page;
+        return this->process_id_ == p.process_id_ && this->page_ == p.page_;
     }
 };
 
 struct Frame {
-    bool free;
-    PageIdentifier page_identifier;
+    bool free_;
+    PageIdentifier page_identifier_;
 
     Frame() {
-        free = true;
+        free_ = true;
     }
 };
 
@@ -110,8 +110,8 @@ class ProcessManager {
 };
 
 
-ProcessManager::ProcessManager(bool b) : real_memory(real_memory_page_amount),
-    swapping_memory(swapping_memory_page_amount), is_fifo(b), time(0.0) {}
+ProcessManager::ProcessManager(bool b) : real_memory(REAL_MEMORY_PAGE_AMOUNT),
+    swapping_memory(SWAPPING_MEMORY_PAGE_AMOUNT), is_fifo(b), time(0.0) {}
 
 // Checks if the id of a process has already been loaded.
 bool ProcessManager::ProcessExists(int id) {
@@ -133,7 +133,7 @@ int ProcessManager::GetNextVictimFrameNumber() {
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
-        if (real_memory[i].page_identifier == victim_page) {
+        if (real_memory[i].page_identifier_ == victim_page) {
             return i;
         }
     }
@@ -146,7 +146,7 @@ int ProcessManager::GetNextVictimFrameNumber() {
 // otherwise.
 int ProcessManager::GetFreeSwappingFrame() {
     for (int i = 0; i < swapping_memory.size(); i++) {
-        if (swapping_memory[i].free) {
+        if (swapping_memory[i].free_) {
             return i;
         }
     }
@@ -157,7 +157,7 @@ int ProcessManager::GetFreeSwappingFrame() {
 // Checks whether all of the real memory's pages have already been used 
 bool ProcessManager::RealMemoryFull() {
     for (const Frame &f : real_memory) {
-        if (f.free) {
+        if (f.free_) {
             return false;
         }
     }
@@ -168,7 +168,7 @@ bool ProcessManager::RealMemoryFull() {
 // Checks whether all of the swapping memory's pages have already been used 
 bool ProcessManager::SwappingMemoryFull() {
     for (const Frame &f : swapping_memory) {
-        if (f.free) {
+        if (f.free_) {
             return false;
         }
     }
@@ -186,7 +186,7 @@ void ProcessManager::AddToQueue(PageIdentifier new_page) {
 
 int ProcessManager::FindFrameNumberSwap(PageIdentifier p) {
     for (int i = 0; i < swapping_memory.size(); i++) {
-        if (swapping_memory[i].page_identifier == p) {
+        if (swapping_memory[i].page_identifier_ == p) {
             return i;
         }
     }
@@ -199,16 +199,16 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     int victim_frame_number = GetNextVictimFrameNumber();
     int swapping_frame_number = GetFreeSwappingFrame();
 
-    swapping_memory[swapping_frame_number].page_identifier = real_memory[victim_frame_number].page_identifier;
-    real_memory[victim_frame_number].page_identifier = new_page;
+    swapping_memory[swapping_frame_number].page_identifier_ = real_memory[victim_frame_number].page_identifier_;
+    real_memory[victim_frame_number].page_identifier_ = new_page;
 
-    int victim_pid = swapping_memory[swapping_frame_number].page_identifier.process_id;
-    int victim_page = swapping_memory[swapping_frame_number].page_identifier.process_id;
+    int victim_pid = swapping_memory[swapping_frame_number].page_identifier_.process_id_;
+    int victim_page = swapping_memory[swapping_frame_number].page_identifier_.process_id_;
 
-    processes.find(victim_pid)->second.setValid(victim_page, false);
+    processes.find(victim_pid)->second.SetValid(victim_page, false);
 
-    processes.find(new_page.process_id)->second.setValid(new_page.page, true);
-    processes.find(new_page.process_id)->second.setFrameNumber(new_page.page, victim_frame_number);
+    processes.find(new_page.process_id_)->second.SetValid(new_page.page_, true);
+    processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, victim_frame_number);
 
     AddToQueue(new_page);
 
@@ -222,15 +222,15 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
 void ProcessManager::InsertPage(PageIdentifier new_page) {
     int new_frame_number = 0;
     for (int i = 0; i < real_memory.size(); i++) {
-        if (real_memory[i].free) {
-            real_memory[i].page_identifier = new_page;
-            real_memory[i].free = false;
+        if (real_memory[i].free_) {
+            real_memory[i].page_identifier_ = new_page;
+            real_memory[i].free_ = false;
             new_frame_number = i;
         }
     }
 
-    processes.find(new_page.process_id)->second.setValid(new_page.page, true);
-    processes.find(new_page.process_id)->second.setFrameNumber(new_page.page, new_frame_number);
+    processes.find(new_page.process_id_)->second.SetValid(new_page.page_, true);
+    processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, new_frame_number);
 
     AddToQueue(new_page);
 }
@@ -240,24 +240,24 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     int id = instruction->GetId();
     int size = instruction->GetBytes();
 
-    current_status.messages.push_back("P"); 
-    current_status.messages.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
+    current_status.messages_.push_back("P"); 
+    current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
 
     if (ProcessExists(id)) {
-        current_status.success = false;
-        current_status.critical_error = false;
-        current_status.messages.push_back("Tried to load existent process");
+        current_status.success_ = false;
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("Tried to load existent process");
         return;
     }
 
-    if (size > real_memory_size) {
-        current_status.success = false;
-        current_status.critical_error = true;
-        current_status.messages.push_back("Process bigger than real memory");
+    if (size > REAL_MEMORY_SIZE) {
+        current_status.success_ = false;
+        current_status.critical_error_ = true;
+        current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
 
-    int frame_amount = (int) ceil( (double) size / (double) page_size);
+    int frame_amount = (int) ceil( (double) size / (double) PAGE_SIZE);
 
     Process p(id, size, frame_amount);
     processes.insert(std::make_pair(id, p));
@@ -270,9 +270,9 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
             // This will cause a runtime error since both the real and swapping memory are
             // full so there is no space to swap anymore.
             if (SwappingMemoryFull()) {
-                current_status.success = false;
-                current_status.critical_error = true;
-                current_status.messages.push_back("Real memory and swapping memory full");
+                current_status.success_ = false;
+                current_status.critical_error_ = true;
+                current_status.messages_.push_back("Real memory and swapping memory full");
                 return;
             }
             SwapPage(new_page);
@@ -281,9 +281,9 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         }
     }
 
-    current_status.success = true;
-    current_status.critical_error = false;
-    current_status.messages.push_back("Process " + std::to_string(id) + " loaded correctly");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
+    current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
 }
 
 void ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
@@ -293,40 +293,40 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     int virtual_address = instruction->GetVirtualAddress();
     int option = instruction->GetOption();
 
-    current_status.messages.push_back("A"); 
-    current_status.messages.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
+    current_status.messages_.push_back("A"); 
+    current_status.messages_.push_back("Accessing the real memory address according to the virtual address of " + std::to_string(virtual_address)+ ".");
 
     //If the option also writes/modifies it must declare that it does.
     if(option == 1){
-        current_status.messages.push_back("Modifying the address given.");
+        current_status.messages_.push_back("Modifying the address given.");
     }
     // Throws an error message when accesing a non-existing progress
     if(!ProcessExists(id)){
-        current_status.success = false;
-        current_status.critical_error = false;
-        current_status.messages.push_back("Tried to access a non-existing process.");
+        current_status.success_ = false;
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("Tried to access a non-existing process.");
         return;
     }
     // Throws an error message if the address is out of range
-    if(virtual_address < 0) //TODO: Also check if the page_size * the number of frames is out of range
+    if(virtual_address < 0) //TODO: Also check if the PAGE_SIZE * the number of frames is out of range
     {
-        current_status.success = false;
-        current_status.critical_error = false;
-        current_status.messages.push_back("The virtual address given is out of the range of the processes' addresses.");
+        current_status.success_ = false;
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
         return;
     }
     
     //Calculates the page and displacement of the tuple v = (p,d)
-    int page = std::floor(virtual_address / page_size);
-    int displacement = virtual_address % page_size;
+    int page = std::floor(virtual_address / PAGE_SIZE);
+    int displacement = virtual_address % PAGE_SIZE;
 
     // Check if page is not in real memory
-    if (!processes.find(id)->second.getValid(page)) {
+    if (!processes.find(id)->second.GetValid(page)) {
         // If it is not, then find its address in the swapping memory
         PageIdentifier p(id, page);
         int swapping_frame = FindFrameNumberSwap(p);
         // Then set it to free
-        swapping_memory[swapping_frame].free = true;
+        swapping_memory[swapping_frame].free_ = true;
         // Now call SwapPage, which will automatically choose a page from real memory
         // to swap and will insert the new page
         SwapPage(p);
@@ -334,9 +334,9 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         // Page in memory, so no operation is needed
     }
 
-    current_status.success = true;
-    current_status.critical_error = false;
-    current_status.messages.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
+    current_status.messages_.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 }
 
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
@@ -345,29 +345,29 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     std::queue<PageIdentifier> temp;
 
     if(!ProcessExists(id)){
-        current_status.success = false;
-        current_status.critical_error = false;
-        current_status.messages.push_back("Tried to free a non-existing process.");
+        current_status.success_ = false;
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("Tried to free a non-existing process.");
         return;
     }
 
     // Set the frames of the swapping and real memory as free if they belong to the process.
     for (int i = 0; i < swapping_memory.size(); i++) {
-        if(!swapping_memory[i].free && swapping_memory[i].page_identifier.process_id == id) {
-            swapping_memory[i].free = true;
+        if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
+            swapping_memory[i].free_ = true;
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
-        if(!real_memory[i].free && real_memory[i].page_identifier.process_id == id) {
-            real_memory[i].free = true;
+        if(!real_memory[i].free_ && real_memory[i].page_identifier_.process_id_ == id) {
+            real_memory[i].free_ = true;
         }
     }
 
     // If they are different processes, push them into another queue.
     if (is_fifo) {
         while (!fifo.empty()) {
-            if (fifo.front().process_id != id) {
+            if (fifo.front().process_id_ != id) {
                 temp.push(fifo.front());
             }
             
@@ -378,7 +378,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     }
     else {
         while (!lru.empty()) {
-            if (lru.front().process_id != id) {
+            if (lru.front().process_id_ != id) {
                 temp.push(lru.front());
             }
             
@@ -388,19 +388,19 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         lru = temp;
     }
 
-    current_status.success = true;
-    current_status.critical_error = false;
-    current_status.messages.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
+    current_status.messages_.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
 }
 
 void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<CommentInstruction>(current_instruction);
     std::string comment = instruction->GetComment();
 
-    current_status.messages.push_back("C"); 
-    current_status.messages.push_back(comment); 
-    current_status.success = true;
-    current_status.critical_error = false;
+    current_status.messages_.push_back("C"); 
+    current_status.messages_.push_back(comment); 
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
     /* TODO: The reader only reads the first word of the comment given
             test2.txt:
                 Expected Output: archivo de prueba para FIFO, LRU
@@ -411,18 +411,18 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
-    current_status.messages.push_back("F");
-    current_status.messages.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
+    current_status.messages_.push_back("F");
+    current_status.messages_.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
 
 }
 
 void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
-    current_status.messages.push_back("E");
-    current_status.messages.push_back("End of instuctions.");
-    current_status.success = true;
-    current_status.critical_error = false;
+    current_status.messages_.push_back("E");
+    current_status.messages_.push_back("End of instuctions.");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
 }
 
 OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
@@ -430,8 +430,8 @@ OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
     std::shared_ptr<Instruction> current_instruction = factory.MakeInstruction(instruction);
     
     // Reset current status for new operation
-    current_status.success = true;
-    current_status.messages.clear();
+    current_status.success_ = true;
+    current_status.messages_.clear();
 
     switch (token_type) {
         case TokenType::Load: {
