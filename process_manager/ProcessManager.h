@@ -66,7 +66,8 @@ class ProcessManager {
     std::vector<Frame> swapping_memory;
     bool is_fifo;
     double time;
-    int swap_operations;
+    int swapIn_operations;
+    int swapOut_operations;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -395,7 +396,8 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
     current_status.messages_.push_back("F");
-    current_status.messages_.push_back("Swap In/Out Operations: " + std::to_string(swap_operations));
+    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
+    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
 }
 
