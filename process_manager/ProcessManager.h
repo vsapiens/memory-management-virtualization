@@ -247,13 +247,13 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         return;
     }
 
-    if (size > real_memory_size) {
+    if (size > REAL_MEMORY_SIZE) {
         current_status.success_ = false;
         current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
 
-    int frame_amount = (int) ceil( (double) size / (double) page_size);
+    int frame_amount = (int) ceil( (double) size / (double) PAGE_SIZE);
 
     Process p(id, size, frame_amount);
     processes.insert(std::make_pair(id, p));
@@ -301,7 +301,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         return;
     }
     // Throws an error message if the address is out of range
-    if(virtual_address < 0) //TODO: Also check if the page_size * the number of frames is out of range
+    if(virtual_address < 0) //TODO: Also check if the PAGE_SIZE * the number of frames is out of range
     {
         current_status.success_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
@@ -309,8 +309,8 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     }
     
     //Calculates the page and displacement of the tuple v = (p,d)
-    int page = std::floor(virtual_address / page_size);
-    int displacement = virtual_address % page_size;
+    int page = std::floor(virtual_address / PAGE_SIZE);
+    int displacement = virtual_address % PAGE_SIZE;
 
     // Check if page is not in real memory
     if (!processes.find(id)->second.GetValid(page)) {
