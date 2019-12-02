@@ -66,10 +66,13 @@ class ProcessManager {
     InstructionFactory factory;
     std::vector<Frame> real_memory;
     std::vector<Frame> swapping_memory;
+    std::vector<std::pair<int, double> > turnarounds; 
     bool is_fifo;
     double time;
     int swapIn_operations;
     int swapOut_operations;
+    int page_faults;
+    int avg_turnaround;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -105,6 +108,10 @@ class ProcessManager {
     void AddToQueue(PageIdentifier new_page);
 
     int FindFrameNumberSwap(PageIdentifier p);
+
+    void Reset();
+
+    void OutputMetrics();
  public:
     ProcessManager(bool is_fifo);
     OperationStatus DoProcess(std::vector<Token> instruction);
@@ -213,6 +220,8 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
 
     AddToQueue(new_page);
     time += 0.1;
+    swapOut_operations++;
+    page_faults++;
 }
 
 // Insert a page into real memory. This function assumes that the real memory has at
@@ -232,6 +241,49 @@ void ProcessManager::InsertPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, new_frame_number);
 
     AddToQueue(new_page);
+    page_faults++;
+}
+
+void ProcessManager::Reset() {
+    while (!fifo.empty()) {
+        fifo.pop();
+    }
+    while (!lru.empty()) {
+        lru.pop();
+    }
+    real_memory.clear();
+    swapping_memory.clear();
+
+    processes.clear();
+
+    time = 0.0;
+    swapIn_operations = 0;
+    swapOut_operations = 0;
+    avg_turnaround = 0;
+    page_faults = 0;
+
+    turnarounds.clear(); 
+}
+
+void ProcessManager::OutputMetrics() {
+     std::unordered_map<int, Process>::iterator it;
+    
+    for(it = processes.begin(); it != processes.end();it++) {
+        turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
+    }
+
+    current_status.messages_.push_back("Turnarounds of Processes: ");
+
+    for(int i = 0; i < turnarounds.size(); i++) {
+        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
+        avg_turnaround += turnarounds[i].second;
+    }
+    avg_turnaround /= (double) turnarounds.size();
+    current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
+    current_status.messages_.push_back("Page Faults: " + std::to_string(page_faults));
+    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
+    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
+
 }
 
 void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction) {
@@ -263,7 +315,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     processes.insert(std::make_pair(id, p));
 
     processes[id].SetTime(time);
-    
+
     // We insert a new page for each frame amount, starting the page's id at 0 until
     // frame_amount - 1.
     for (int i = 0; i < frame_amount; i++) {
@@ -330,6 +382,8 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         int swapping_frame = FindFrameNumberSwap(p);
         // Then set it to free
         swapping_memory[swapping_frame].free_ = true;
+        swapIn_operations++;
+        time += 0.1;
         // Now call SwapPage, which will automatically choose a page from real memory
         // to swap and will insert the new page
         SwapPage(p);
@@ -412,6 +466,9 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         lru = temp;
     }
 
+    turnarounds.push_back(std::make_pair(id, time - processes[id].GetTime()));
+    processes.erase(id);
+
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
@@ -436,15 +493,16 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
     current_status.messages_.push_back("F");
-    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
-    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
+    OutputMetrics();
 
+    Reset();
 }
 
 void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
     current_status.messages_.push_back("E");
+    OutputMetrics();
     current_status.messages_.push_back("End of instuctions.");
     current_status.success_ = true;
     current_status.critical_error_ = false;
