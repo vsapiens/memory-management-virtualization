@@ -29,6 +29,7 @@ struct TableEntry {
 class Process {
  public:
     Process(const int id, const int size, const int f_amount);
+    Process();
 
     int GetFrameNumber(const int vAddress);
     int GetValid(const int vAddress);
@@ -51,6 +52,7 @@ class Process {
 
 
 Process::Process(int id, int size, int f_amount):id_(id),size_(size), pageTable(f_amount), time_(0){}
+Process::Process():id_(-1),size_(-1), pageTable(0), time_(0){}
 
 inline int Process::GetFrameNumber(const int vAddress) {
     return pageTable[vAddress / size_].frame_number_;
