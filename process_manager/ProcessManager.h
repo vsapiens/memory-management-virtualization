@@ -247,12 +247,18 @@ void ProcessManager::Reset() {
     while (!lru.empty()) {
         lru.pop();
     }
-    std::vector<Frame> real_memory.clear();
-    std::vector<Frame> swapping_memory.clear();
+    real_memory.clear();
+    swapping_memory.clear();
+
+    processes.clear();
 
     time = 0.0;
     swapIn_operations = 0;
     swapOut_operations = 0;
+    avg_turnaround = 0;
+    page_faults = 0;
+
+    turnarounds.clear(); 
 }
 
 void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction) {
