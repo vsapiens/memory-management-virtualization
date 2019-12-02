@@ -246,7 +246,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     if (ProcessExists(id)) {
         current_status.success_ = false;
         current_status.critical_error_ = false;
-        current_status.messages_.push_back("Tried to load existent process");
+        current_status.messages_.push_back("ERROR: Tried to load existent process");
         return;
     }
 
@@ -304,7 +304,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     if(!ProcessExists(id)){
         current_status.success_ = false;
         current_status.critical_error_ = false;
-        current_status.messages_.push_back("Tried to access a non-existing process.");
+        current_status.messages_.push_back("ERROR: Tried to access a non-existing process.");
         return;
     }
     // Throws an error message if the address is out of range
