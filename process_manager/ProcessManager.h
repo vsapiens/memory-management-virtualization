@@ -66,10 +66,13 @@ class ProcessManager {
     InstructionFactory factory;
     std::vector<Frame> real_memory;
     std::vector<Frame> swapping_memory;
+    std::vector<std::pair<int, double> > turnarounds; 
     bool is_fifo;
     double time;
     int swapIn_operations;
     int swapOut_operations;
+    int page_faults;
+    int avg_turnaround;
     OperationStatus current_status;
     // Loads a process into real memory.
     void Load(const std::shared_ptr<Instruction> current_instruction);
@@ -413,6 +416,8 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
         lru = temp;
     }
 
+    turnarounds.push_back(std::make_pair(id, time - processes[id].GetTime()));
+
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
@@ -435,8 +440,21 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
+    std::unordered_map<int, Process>::iterator it;
+
+    for(it = processes.begin(); it != processes.end();it++)
+    {
+        turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
+    }
 
     current_status.messages_.push_back("F");
+    current_status.messages_.push_back("Turnarounds of Processes: ");
+    for(int i = 0; i < turnarounds.size(); i++)
+    {
+        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
+    }
+
+    current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
     current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
     current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
