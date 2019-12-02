@@ -299,6 +299,8 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     int size = instruction->GetBytes();
     std::string pages_used = "";
 
+    current_status.messages_.push_back("P " + std::to_string(size) + " " + std::to_string(id)); 
+
     if (ProcessExists(id)) {
         current_status.success_ = false;
         current_status.critical_error_ = false;
@@ -313,7 +315,6 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
         return;
     }
 
-    current_status.messages_.push_back("P " + std::to_string(size) + " " + std::to_string(id)); 
     current_status.messages_.push_back("Assigning " + std::to_string(size) + " bytes to the process " + std::to_string(id));
 
     int frame_amount = (int) ceil( (double) size / (double) PAGE_SIZE);
