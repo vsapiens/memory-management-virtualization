@@ -335,7 +335,7 @@ OperationStatus ProcessManager::Exit(const std::shared_ptr<Instruction> current_
     OperationStatus status;
 
     status.success = true;
-    status.message = "End of instuctions."
+    status.message = "End of instuctions.";
     
     return status;
 }
