@@ -274,6 +274,7 @@ void ProcessManager::OutputMetrics() {
     }
     avg_turnaround /= (double) turnarounds.size();
     current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
+    current_status.messages_.push_back("Page Faults: " + std::to_string(page_faults));
     current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
     current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
 
