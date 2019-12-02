@@ -87,6 +87,8 @@
         "__node_handle": "cpp",
         "bit": "cpp",
         "optional": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "memory_resource": "cpp",
+        "random": "cpp"
     }
 }
