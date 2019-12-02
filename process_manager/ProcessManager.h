@@ -284,6 +284,7 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
     return status;
 }
 OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> current_instruction) {
+
     auto instruction = std::dynamic_pointer_cast<AccessInstruction>(current_instruction);
     int id = instruction->GetId();
     int virtual_address = instruction->GetVirtualAddress();
@@ -304,9 +305,12 @@ OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> curren
         return status;
     }
     
-
     int page = std::floor(virtual_address / page_size);
-    int displacement = (int)( virtual_address/ page_size) * page_size;
+    int displacement = virtual_address % page_size;
+    
+
+    status.success = true;
+    status.message = "Real Memory Address " + std::to_string(virtual_address) + " = " + std::to_string(page)+ " , "+ std::to_string(displacement) + ")";
 
 }
 OperationStatus ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
