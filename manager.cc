@@ -25,8 +25,14 @@ int GetNextFinalize(std::vector<std::vector<sisops::Token>> token_list, int init
 // It handles the input, the process of counting the archives and the output for the program.
 // Parameters: -
 // Return: Int, describing the correct compilation of the program
-int main()
-{
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " < -f | -l >" << std::endl;
+        exit(1);
+    }
+
+    bool fifo = argv[1][1] == 'f';
+
     auto result = sisops::readAndParseInputFile("test.txt");
     std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
     std::vector<sisops::Error> errors = std::get<1>(result);
@@ -41,7 +47,7 @@ int main()
         std::cout << "PARSER: File free from errors" << std::endl;
     }
 
-    sisops::ProcessManager pm(false);
+    sisops::ProcessManager pm(fifo);
 
     // Process each instruction.
     for (int i = 0; i < token_list.size(); i++) {
