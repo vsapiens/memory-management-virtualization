@@ -326,6 +326,27 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         // Page in memory, so no operation is needed
     }
 
+    std::queue<PageIdentifier> tempQ; // Queue to save the pages that have different id to the process id being accessed.
+    PageIdentifier tempP; // Temporal variable to save the process that is being accesed.
+
+    // If the algorithm is LRU, finds the process being accessed and stores it in a temporal variable.
+    if (!is_fifo) {
+        while (!lru.empty()) {
+            if (lru.front().process_id != id) {
+                tempQ.push(lru.front());
+            }
+            else {
+                tempP = lru.front();
+            }
+            
+            lru.pop();
+        }
+    }
+
+    // Copies the queue without the process that is being access and inserts the process at the end of the queue.
+    lru = tempQ;
+    lru.push(tempP);
+
     current_status.success = true;
     current_status.messages.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 }
