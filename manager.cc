@@ -36,6 +36,9 @@ int main()
 
     for (const std::vector<sisops::Token>& tokens : token_list) {
         sisops::OperationStatus result = pm.DoProcess(tokens);
-        std::cout << result.message << std::endl;
+
+        for (const std::string& message : result.messages) {
+            std::cout << message << std::endl;
+        }
     }
 }

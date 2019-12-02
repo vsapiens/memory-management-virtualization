@@ -23,11 +23,10 @@ namespace sisops{
 
 struct OperationStatus {
     bool success;
-    std::string message;
+    std::vector<std::string> messages;
 
     OperationStatus() {
         success = true;
-        message = "";
     }
 };
 
@@ -244,13 +243,13 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
 
     if (ProcessExists(id)) {
         status.success = false;
-        status.message = "Tried to load existent process";
+        status.messages.push_back("Tried to load existent process");
         return status;
     }
 
     if (size > real_memory_size) {
         status.success = false;
-        status.message = "Process bigger than real memory";
+        status.messages.push_back("Process bigger than real memory");
         return status;
     }
 
@@ -258,7 +257,6 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
 
     Process p(id, size, frame_amount);
     processes.push_back(p);
-
 
     // We insert a new page for each frame amount, starting the page's id at 0 until
     // frame_amount - 1.
@@ -269,7 +267,7 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
             // full so there is no space to swap anymore.
             if (SwappingMemoryFull()) {
                 status.success = false;
-                status.message = "Real memory and swapping memory full";
+                status.messages.push_back("Real memory and swapping memory full");
                 return status;
             }
             SwapPage(new_page);
@@ -279,7 +277,7 @@ OperationStatus ProcessManager::Load(const std::shared_ptr<Instruction> current_
     }
 
     status.success = true;
-    status.message = "Process " + std::to_string(id) + " loaded correctly";
+    status.messages.push_back("Process " + std::to_string(id) + " loaded correctly");
 
     return status;
 }
@@ -294,14 +292,14 @@ OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> curren
 
     if(!ProcessExists(id)){
         status.success = false;
-        status.message = "Tried to access a non-existing process.";
+        status.messages.push_back("Tried to access a non-existing process.");
         return status;
     }
     
     if(virtual_address < 0)
     {
         status.success = false;
-        status.message = "The virtual address given is out of the range of the processes' addresses.";
+        status.messages.push_back("The virtual address given is out of the range of the processes' addresses.");
         return status;
     }
     
@@ -310,7 +308,7 @@ OperationStatus ProcessManager::Access(const std::shared_ptr<Instruction> curren
     
 
     status.success = true;
-    status.message = "Real Memory Address " + std::to_string(virtual_address) + " = " + std::to_string(page)+ " , "+ std::to_string(displacement) + ")";
+    status.messages.push_back("Real Memory Address " + std::to_string(virtual_address) + " = " + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 
 }
 OperationStatus ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
@@ -323,7 +321,7 @@ OperationStatus ProcessManager::Comment(const std::shared_ptr<Instruction> curre
     OperationStatus status;
 
     status.success = true;
-    status.message = comment;
+    status.messages.push_back(comment);
 
     return status;
 }
@@ -335,7 +333,7 @@ OperationStatus ProcessManager::Exit(const std::shared_ptr<Instruction> current_
     OperationStatus status;
 
     status.success = true;
-    status.message = "End of instuctions.";
+    status.messages.push_back("End of instuctions.");
     
     return status;
 }
