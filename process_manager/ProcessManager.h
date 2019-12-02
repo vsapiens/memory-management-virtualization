@@ -379,7 +379,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     }
 
     current_status.success = true;
-    current_status.messages.push_back("The pages of the process are available for other operations.");
+    current_status.messages.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
 }
 
 void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruction) {
