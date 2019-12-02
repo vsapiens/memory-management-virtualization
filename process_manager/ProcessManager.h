@@ -110,6 +110,8 @@ class ProcessManager {
     int FindFrameNumberSwap(PageIdentifier p);
 
     void Reset();
+
+    void OutputMetrics();
  public:
     ProcessManager(bool is_fifo);
     OperationStatus DoProcess(std::vector<Token> instruction);
@@ -219,6 +221,7 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     AddToQueue(new_page);
     time += 0.1;
     swapOut_operations++;
+    page_faults++;
 }
 
 // Insert a page into real memory. This function assumes that the real memory has at
@@ -238,6 +241,7 @@ void ProcessManager::InsertPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, new_frame_number);
 
     AddToQueue(new_page);
+    page_faults++;
 }
 
 void ProcessManager::Reset() {
@@ -253,6 +257,26 @@ void ProcessManager::Reset() {
     time = 0.0;
     swapIn_operations = 0;
     swapOut_operations = 0;
+}
+
+void ProcessManager::OutputMetrics() {
+     std::unordered_map<int, Process>::iterator it;
+    
+    for(it = processes.begin(); it != processes.end();it++) {
+        turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
+    }
+
+    current_status.messages_.push_back("Turnarounds of Processes: ");
+
+    for(int i = 0; i < turnarounds.size(); i++) {
+        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
+        avg_turnaround += turnarounds[i].second;
+    }
+    avg_turnaround /= (double) turnarounds.size();
+    current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
+    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
+    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
+
 }
 
 void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction) {
@@ -458,22 +482,9 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
-    std::unordered_map<int, Process>::iterator it;
-
-    for(it = processes.begin(); it != processes.end();it++) {
-        turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
-    }
 
     current_status.messages_.push_back("F");
-    current_status.messages_.push_back("Turnarounds of Processes: ");
-
-    for(int i = 0; i < turnarounds.size(); i++) {
-        current_status.messages_.push_back("Process ID: " + std::to_string(turnarounds[i].first) + "Turnaround Time: " + std::to_string(turnarounds[i].second));
-    }
-
-    current_status.messages_.push_back("Average Turnarounds: " + std::to_string(avg_turnaround));
-    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
-    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
+    OutputMetrics();
 
     Reset();
 }
@@ -482,6 +493,7 @@ void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
     current_status.messages_.push_back("E");
+    OutputMetrics();
     current_status.messages_.push_back("End of instuctions.");
     current_status.success_ = true;
     current_status.critical_error_ = false;
