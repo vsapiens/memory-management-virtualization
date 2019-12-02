@@ -24,10 +24,12 @@ namespace sisops{
 
 struct OperationStatus {
     bool success_;
+    bool critical_error_;
     std::vector<std::string> messages_;
 
     OperationStatus() {
         success_ = true;
+        critical_error_ = false;
     }
 };
 
@@ -242,12 +244,14 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
 
     if (ProcessExists(id)) {
         current_status.success_ = false;
-        current_status.messages_.push_back("Tried to load existent process");
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("ERROR: Tried to load existent process");
         return;
     }
 
     if (size > REAL_MEMORY_SIZE) {
         current_status.success_ = false;
+        current_status.critical_error_ = true;
         current_status.messages_.push_back("Process bigger than real memory");
         return;
     }
@@ -266,6 +270,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
             // full so there is no space to swap anymore.
             if (SwappingMemoryFull()) {
                 current_status.success_ = false;
+                current_status.critical_error_ = true;
                 current_status.messages_.push_back("Real memory and swapping memory full");
                 return;
             }
@@ -276,6 +281,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     }
 
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
 }
 
@@ -296,13 +302,15 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     // Throws an error message when accesing a non-existing progress
     if(!ProcessExists(id)){
         current_status.success_ = false;
-        current_status.messages_.push_back("Tried to access a non-existing process.");
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("ERROR: Tried to access a non-existing process.");
         return;
     }
     // Throws an error message if the address is out of range
     if(virtual_address < 0) //TODO: Also check if the PAGE_SIZE * the number of frames is out of range
     {
         current_status.success_ = false;
+        current_status.critical_error_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
         return;
     }
@@ -347,6 +355,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     lru.push(tempP);
 
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
 }
 
@@ -357,6 +366,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
 
     if(!ProcessExists(id)){
         current_status.success_ = false;
+        current_status.critical_error_ = false;
         current_status.messages_.push_back("Tried to free a non-existing process.");
         return;
     }
@@ -399,6 +409,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     }
 
     current_status.success_ = true;
+    current_status.critical_error_ = false;
     current_status.messages_.push_back("The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.");
 }
 
@@ -407,8 +418,14 @@ void ProcessManager::Comment(const std::shared_ptr<Instruction> current_instruct
     std::string comment = instruction->GetComment();
 
     current_status.messages_.push_back("C"); 
-    current_status.success_ = true;
     current_status.messages_.push_back(comment); 
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
+    /* TODO: The reader only reads the first word of the comment given
+            test2.txt:
+                Expected Output: archivo de prueba para FIFO, LRU
+                Given Output:    archivo 
+    */
 }
 
 void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruction) {
@@ -424,8 +441,9 @@ void ProcessManager::Exit(const std::shared_ptr<Instruction> current_instruction
     auto instruction = std::dynamic_pointer_cast<ExitInstruction>(current_instruction);
 
     current_status.messages_.push_back("E");
-    current_status.success_ = true;
     current_status.messages_.push_back("End of instuctions.");
+    current_status.success_ = true;
+    current_status.critical_error_ = false;
 }
 
 OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
