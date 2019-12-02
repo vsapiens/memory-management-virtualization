@@ -344,14 +344,12 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free && swapping_memory[i].page_identifier.process_id == id) {
             swapping_memory[i].free = true;
-            //quitarlo el elemento del vector swapping_memory
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free && real_memory[i].page_identifier.process_id == id) {
             real_memory[i].free = true;
-            //quitar el elemento del vector real_memory
         }
     }
 
