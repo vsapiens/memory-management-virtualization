@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <queue>
 #include <cmath>
 
@@ -62,7 +62,7 @@ class ProcessManager {
  private:
     std::queue<PageIdentifier> fifo;
     std::queue<PageIdentifier> lru;
-    std::unordered_map<int, Process> processes;
+    std::map<int, Process> processes;
     InstructionFactory factory;
     std::vector<Frame> real_memory;
     std::vector<Frame> swapping_memory;
@@ -112,6 +112,8 @@ class ProcessManager {
     void Reset();
 
     void OutputMetrics();
+
+    void FreeAux(int id);
  public:
     ProcessManager(bool is_fifo);
     OperationStatus DoProcess(std::vector<Token> instruction);
@@ -267,7 +269,7 @@ void ProcessManager::Reset() {
 }
 
 void ProcessManager::OutputMetrics() {
-     std::unordered_map<int, Process>::iterator it;
+     std::map<int, Process>::iterator it;
     
     for(it = processes.begin(); it != processes.end();it++) {
         turnarounds.push_back(std::make_pair(it->first, time - it->second.GetTime()));
@@ -423,20 +425,8 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     time += 0.1;
 }
 
-void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
-    auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
-    int id = instruction->GetId();
+void ProcessManager::FreeAux(int id) {
     std::queue<PageIdentifier> temp;
-
-    current_status.messages_.push_back("L " + std::to_string(id));
-
-    if(!ProcessExists(id)){
-        current_status.success_ = false;
-        current_status.critical_error_ = false;
-        current_status.messages_.push_back("Tried to free a non-existing process.");
-        return;
-    }
-
     // Set the frames of the swapping and real memory as free if they belong to the process.
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
@@ -478,6 +468,22 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
 
     turnarounds.push_back(std::make_pair(id, time - processes[id].GetTime()));
     processes.erase(id);
+}
+
+void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
+    auto instruction = std::dynamic_pointer_cast<FreeInstruction>(current_instruction);
+    int id = instruction->GetId();
+    current_status.messages_.push_back("L " + std::to_string(id));
+
+
+    if(!ProcessExists(id)){
+        current_status.success_ = false;
+        current_status.critical_error_ = false;
+        current_status.messages_.push_back("Tried to free a non-existing process.");
+        return;
+    }
+
+    FreeAux(id);
 
     current_status.success_ = true;
     current_status.critical_error_ = false;
@@ -497,6 +503,13 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     auto instruction = std::dynamic_pointer_cast<FinalizeInstruction>(current_instruction);
 
     current_status.messages_.push_back("F");
+
+    std::map<int, Process>::iterator it;
+
+    for (it = processes.begin(); it != processes.end(); it++) {
+        FreeAux(it->first);
+    }
+
     OutputMetrics();
     Reset();
 }
