@@ -222,9 +222,7 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, victim_frame_number);
 
     AddToQueue(new_page);
-    time += 0.1;
     swapOut_operations++;
-    page_faults++;
 }
 
 // Insert a page into real memory. This function assumes that the real memory has at
@@ -245,7 +243,6 @@ void ProcessManager::InsertPage(PageIdentifier new_page) {
     processes.find(new_page.process_id_)->second.SetFrameNumber(new_page.page_, new_frame_number);
 
     AddToQueue(new_page);
-    page_faults++;
 }
 
 void ProcessManager::Reset() {
@@ -338,15 +335,16 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
                 return;
             }
             SwapPage(new_page);
+            time += 1;
         } else {
             InsertPage(new_page);
         }
         pages_used = pages_used + std::to_string(processes[id].GetFrameNumber(i)) + ", ";
+        time += 1;
     }
 
     current_status.messages_.push_back("Pages used in the loading of this process:");
     current_status.messages_.push_back(pages_used);
-    time += 1;
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("Process " + std::to_string(id) + " loaded correctly");
@@ -373,7 +371,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         return;
     }
     // Throws an error message if the address is out of range.
-    if(virtual_address < 0) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
+    if(virtual_address < 0 || virtual_address > processes[id].GetSize() ) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
         current_status.success_ = false;
         current_status.critical_error_ = false;
         current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
@@ -392,10 +390,11 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         // Then set it to free
         swapping_memory[swapping_frame].free_ = true;
         swapIn_operations++;
-        time += 0.1;
         // Now call SwapPage, which will automatically choose a page from real memory
         // to swap and will insert the new page
         SwapPage(p);
+        page_faults++;
+        time += 2;
     } else {
         // Page in memory, so no operation is needed
     }
@@ -419,10 +418,10 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
         lru = tempQ;
         lru.push(tempP);
     }
-
     current_status.success_ = true;
     current_status.critical_error_ = false;
     current_status.messages_.push_back("Real Memory Address " + std::to_string(virtual_address) + " = (" + std::to_string(page)+ " , "+ std::to_string(displacement) + ")");
+    time += 0.1;
 }
 
 void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction) {
@@ -443,16 +442,16 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
             swapping_memory[i].free_ = true;
-            time += 0.1;
         }
     }
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free_ && real_memory[i].page_identifier_.process_id_ == id) {
             real_memory[i].free_ = true;
-            time += 0.1;
         }
     }
+
+    time += std::ceil((float)processes[id].GetSize() / (float) PAGE_SIZE) * 0.1;
 
     // If they are different processes, push them into another queue.
     if (is_fifo) {
@@ -550,6 +549,8 @@ OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
         }
         break;
     }
+
+    std::cout << std::endl << time << std::endl;
 
     return current_status;
 }
