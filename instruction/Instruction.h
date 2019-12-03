@@ -20,7 +20,12 @@ class Instruction {
     InstructionType instruction_type;
     InstructionType GetInstructionType(const std::string& type);
 };
-
+/*
+Function: Instruction::GetInstructionType
+    This functions gets the instruction type
+Parameters: const std::string& type
+Return: InstructionType
+*/
 InstructionType Instruction::GetInstructionType(const std::string& type) {
     if(type == "P") {
         return InstructionType::Load;
