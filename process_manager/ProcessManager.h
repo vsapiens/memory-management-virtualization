@@ -507,6 +507,7 @@ void ProcessManager::Finalize(const std::shared_ptr<Instruction> current_instruc
     std::map<int, Process>::iterator it;
 
     for (it = processes.begin(); it != processes.end(); it++) {
+        current_status.messages_.push_back("Process " + std::to_string(it->first) + " not freed. Freeing now.");
         FreeAux(it->first);
     }
 
@@ -561,8 +562,6 @@ OperationStatus ProcessManager::DoProcess(std::vector<Token> instruction) {
         }
         break;
     }
-
-    std::cout << std::endl << time << std::endl;
 
     return current_status;
 }
