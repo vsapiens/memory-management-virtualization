@@ -11,7 +11,7 @@ PARTES NUEVAS:
    instruction/InstructionFactory T=37, I=0
    instruction/LoadInstruction T=21, I=0
    process_manager/Process T=49, I=0
-   process_manager/ProcessManager T=330, I=0
+   process_manager/ProcessManager T=340, I=0
    reader/Parser T=123, I=0
    reader/Reader T=47, I=0
    reader/Scanner T=136, I=0
@@ -19,4 +19,4 @@ PARTES NUEVAS:
 --------------------------------------------
 PARTES REUSADAS:
 --------------------------------------------
-Total de LDC=899
+Total de LDC=909
