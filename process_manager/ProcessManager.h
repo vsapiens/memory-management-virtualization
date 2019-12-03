@@ -123,15 +123,26 @@ class ProcessManager {
 ProcessManager::ProcessManager(bool b) : real_memory(REAL_MEMORY_PAGE_AMOUNT),
     swapping_memory(SWAPPING_MEMORY_PAGE_AMOUNT), is_fifo(b), time(0.0),page_faults(0),swapIn_operations(0),swapOut_operations(0),avg_turnaround(0){}
 
-// Checks if the id of a process has already been loaded.
+/*
+Function: ProcessManager::ProcessExists
+    Checks if the id of a process has already been loaded.
+Parameters: const int id
+Return: bool
+*/
 bool ProcessManager::ProcessExists(const int id) {
     return processes.find(id) != processes.end();
 }
 
-// Gets the frame number of the next process in line, whether it's fifo or lru. This
-// function asumes that the page returned by either fifo or lru is indeed in real memory.
-// If it is not, -1 is returned. Also, this function modifies either the fifo or lru queue.
-// Thus it must only be called once per swap.
+
+/*
+Function: ProcessManager::GetNextVictimFrameNumber()
+    Gets the frame number of the next process in line, whether it's fifo or lru. This
+    function asumes that the page returned by either fifo or lru is indeed in real memory.
+    If it is not, -1 is returned. Also, this function modifies either the fifo or lru queue.
+    Thus it must only be called once per swap.
+Parameters: -
+Return: int
+*/
 int ProcessManager::GetNextVictimFrameNumber() {
     PageIdentifier victim_page;
     if (is_fifo) {
@@ -151,9 +162,14 @@ int ProcessManager::GetNextVictimFrameNumber() {
     return -1;
 }
 
-// Returns the first free frame in the swapping memory. User must first check that
-// free spaces exist in the swapping memory using SwappingMemoryFull. It will return -1
-// otherwise.
+/*
+Function: ProcessManager::GetFreeSwappingFrame()
+    Returns the first free frame in the swapping memory. User must first check that
+    free spaces exist in the swapping memory using SwappingMemoryFull. It will return -1
+    otherwise.
+Parameters: -
+Return: int
+*/
 int ProcessManager::GetFreeSwappingFrame() {
     for (int i = 0; i < swapping_memory.size(); i++) {
         if (swapping_memory[i].free_) {
@@ -164,7 +180,12 @@ int ProcessManager::GetFreeSwappingFrame() {
     return -1;
 }
 
-// Checks whether all of the real memory's pages have already been used.
+/*
+Function: ProcessManager::RealMemoryFull()
+    Checks whether all of the real memory's pages have already been used.
+Parameters: -
+Return: bool
+*/
 bool ProcessManager::RealMemoryFull() {
     for (const Frame &f : real_memory) {
         if (f.free_) {
@@ -175,7 +196,12 @@ bool ProcessManager::RealMemoryFull() {
     return true;
 }
 
-// Checks whether all of the swapping memory's pages have already been used.
+/*
+Function: ProcessManager::RealMemoryFull()
+    Checks whether all of the swapping memory's pages have already been used.
+Parameters: -
+Return: bool
+*/
 bool ProcessManager::SwappingMemoryFull() {
     for (const Frame &f : swapping_memory) {
         if (f.free_) {
@@ -204,7 +230,12 @@ int ProcessManager::FindFrameNumberSwap(PageIdentifier p) {
     return -1;
 }
 
-// Swaps an existing page with the current page and returns the page's new frame number.
+/*
+Function: ProcessManager::RealMemoryFull()
+    Swaps an existing page with the current page and returns the page's new frame number.
+Parameters: PageIdentifier new_page
+Return: -
+*/
 void ProcessManager::SwapPage(PageIdentifier new_page) {
     int victim_frame_number = GetNextVictimFrameNumber();
     int swapping_frame_number = GetFreeSwappingFrame();
