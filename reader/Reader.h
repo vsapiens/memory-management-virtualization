@@ -69,7 +69,7 @@ std::tuple<std::vector<std::vector<Token>>, std::vector<Error>> readAndParseInpu
         ParseStatus status = parser.parseIns(tokens);
         
         if (!status.correct) {
-            Error e(i+1, status.message);
+            Error e(i, status.message);
             errors.push_back(e);
         }
         token_list.push_back(tokens);

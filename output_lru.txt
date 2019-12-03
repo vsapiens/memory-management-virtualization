@@ -1,0 +1,138 @@
+-----------------SYNTAX ERROR-----------------
+PARSER: Line 27: Expected Integer or Bit. Got String
+
+WARNING: PARSING ERRORS. CONTINUING OMITING LINES WITH ERRORS
+
+C  archivo de prueba para FIFO, LRU 
+
+P 32 2
+Assigning 32 bytes to the process 2
+Pages used in the loading of this process:
+0, 1, 
+Process 2 loaded correctly
+
+P 48 3
+Assigning 48 bytes to the process 3
+Pages used in the loading of this process:
+2, 3, 4, 
+Process 3 loaded correctly
+
+P 63 4
+Assigning 63 bytes to the process 4
+Pages used in the loading of this process:
+5, 6, 7, 8, 
+Process 4 loaded correctly
+
+L 3
+Freeing the following frame numbers: 2, 3, 4, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+P 80 5
+Assigning 80 bytes to the process 5
+Pages used in the loading of this process:
+2, 3, 4, 9, 10, 
+Process 5 loaded correctly
+
+P 1744 109
+Assigning 1744 bytes to the process 109
+Pages used in the loading of this process:
+11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 
+Process 109 loaded correctly
+
+P 96 6
+Assigning 96 bytes to the process 6
+Pages used in the loading of this process:
+120, 121, 122, 123, 124, 125, 
+Process 6 loaded correctly
+
+A 16 2 0
+Accessing the real memory address according to the virtual address of 16.
+Real Memory Address 16 = (1 , 0)
+
+A 63 4 0
+Accessing the real memory address according to the virtual address of 63.
+Real Memory Address 63 = (3 , 15)
+
+A 62 4 1
+Accessing the real memory address according to the virtual address of 62.
+Modifying the address given.
+Real Memory Address 62 = (3 , 14)
+
+A 1 109 1
+Accessing the real memory address according to the virtual address of 1.
+Modifying the address given.
+Real Memory Address 1 = (0 , 1)
+
+C  
+
+P 96 61
+Assigning 96 bytes to the process 61
+Swapped out process 2, page 0 into swapping memory
+Swapped out process 4, page 0 into swapping memory
+Swapped out process 4, page 1 into swapping memory
+Swapped out process 4, page 2 into swapping memory
+Pages used in the loading of this process:
+126, 127, 0, 5, 6, 7, 
+Process 61 loaded correctly
+
+L 2
+Freeing the following frame numbers: 1, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+A 8 5 0
+Accessing the real memory address according to the virtual address of 8.
+Real Memory Address 8 = (0 , 8)
+
+A 8 4 0
+Accessing the real memory address according to the virtual address of 8.
+Swapped out process 5, page 1 into swapping memory
+Real Memory Address 8 = (0 , 8)
+
+L 5
+Freeing the following frame numbers: 2, 4, 9, 10, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+L 2
+ERROR: Tried to free a non-existing process.
+
+L 4
+Freeing the following frame numbers: 3, 8, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+L 6
+Freeing the following frame numbers: 120, 121, 122, 123, 124, 125, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+L 61
+Freeing the following frame numbers: 0, 5, 6, 7, 126, 127, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+L 109
+Freeing the following frame numbers: 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 
+The frames of the swapping and real memory where the pages of the process were allocated are available for other operations.
+
+F
+Turnarounds of Processes: 
+Process ID: 3  Turnaround Time: 7.300000
+Process ID: 2  Turnaround Time: 139.900000
+Process ID: 5  Turnaround Time: 133.300000
+Process ID: 4  Turnaround Time: 138.000000
+Process ID: 6  Turnaround Time: 20.300000
+Process ID: 61  Turnaround Time: 14.500000
+Process ID: 109  Turnaround Time: 140.800000
+Average Turnaround: 84.871429
+Page Faults: 1
+Swap In/Out Operations: 6
+
+A 2 2 0
+Accessing the real memory address according to the virtual address of 2.
+ERROR: Tried to access a non-existing process.
+
+P 2049 2049
+ERROR: Process bigger than real memory
+-----------CRITICAL ERROR------------
+Jumping to next block of instructions after next F instruction...
+
+E
+End of instuctions.
+

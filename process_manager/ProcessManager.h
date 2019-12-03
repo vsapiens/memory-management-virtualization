@@ -309,7 +309,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
     if (size > REAL_MEMORY_SIZE) {
         current_status.success_ = false;
         current_status.critical_error_ = true;
-        current_status.messages_.push_back("Process bigger than real memory");
+        current_status.messages_.push_back("ERROR: Process bigger than real memory");
         return;
     }
 
@@ -332,7 +332,7 @@ void ProcessManager::Load(const std::shared_ptr<Instruction> current_instruction
             if (SwappingMemoryFull()) {
                 current_status.success_ = false;
                 current_status.critical_error_ = true;
-                current_status.messages_.push_back("Real memory and swapping memory full");
+                current_status.messages_.push_back("ERROR: Real memory and swapping memory full");
                 return;
             }
             SwapPage(new_page);
@@ -375,7 +375,7 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
     if(virtual_address < 0 || virtual_address > processes[id].GetSize() ) { //TODO: Also check if the PAGE_SIZE * the number of frames is out of range.
         current_status.success_ = false;
         current_status.critical_error_ = false;
-        current_status.messages_.push_back("The virtual address given is out of the range of the processes' addresses.");
+        current_status.messages_.push_back("ERROR: The virtual address given is out of the range of the processes' addresses.");
         return;
     }
     
@@ -431,15 +431,20 @@ void ProcessManager::FreeAux(int id) {
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
             swapping_memory[i].free_ = true;
+
         }
     }
+
+    std::string frames = "";
 
     for (int i = 0; i < real_memory.size(); i++) {
         if(!real_memory[i].free_ && real_memory[i].page_identifier_.process_id_ == id) {
             real_memory[i].free_ = true;
+            frames += std::to_string(i) + ", ";
         }
     }
 
+    current_status.messages_.push_back("Freeing the following frame numbers: " + frames);
     time += std::ceil((float)processes[id].GetSize() / (float) PAGE_SIZE) * 0.1;
 
     // If they are different processes, push them into another queue.
@@ -479,7 +484,7 @@ void ProcessManager::Free(const std::shared_ptr<Instruction> current_instruction
     if(!ProcessExists(id)){
         current_status.success_ = false;
         current_status.critical_error_ = false;
-        current_status.messages_.push_back("Tried to free a non-existing process.");
+        current_status.messages_.push_back("ERROR: Tried to free a non-existing process.");
         return;
     }
 
