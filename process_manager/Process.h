@@ -14,9 +14,9 @@
 namespace sisops {
 
 struct TableEntry {
-    //Is the frame number
+    // Number of the frame
     int frame_number_;
-    //Stores if the table entry is valid
+    // Determines if the page is valid 
     bool valid_;
     TableEntry() {
         frame_number_ = -1;
@@ -52,6 +52,7 @@ class Process {
     //Size of the process
     const int size_;
     //Stores the time
+
     double time_;
     //Stores the table entry of the processes
     std::vector<TableEntry> pageTable;

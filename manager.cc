@@ -37,6 +37,8 @@ int main(int argc, char **argv) {
     std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
     std::vector<sisops::Error> errors = std::get<1>(result);
 
+    // If there is an error, display message of error. Else, display a message that displays
+    // that there are no errors
     if (errors.size() > 0) {
         std::cout << "-----------------SYNTAX ERROR-----------------" << std:: endl;
         for (const sisops::Error& e: errors) {
@@ -57,6 +59,7 @@ int main(int argc, char **argv) {
         for (const std::string& message : result.messages_) {
             std::cout << message << std::endl;
         }
+        // If there's an error, display error message
 
         if (result.critical_error_) {
             std::cout << "-----------CRITICAL ERROR------------" << std::endl;
