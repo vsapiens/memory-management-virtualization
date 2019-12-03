@@ -21,7 +21,12 @@ class InstructionFactory final {
  public:
     std::shared_ptr<Instruction> MakeInstruction(const std::vector<Token>& tokens) const;
 };
-
+/*
+Function: InstructionFactory::MakeInstruction
+    This functions makes the instruction
+Parameters: const std::vector<Token>& tokens
+Return: std::shared_ptr<Instruction> 
+*/
 std::shared_ptr<Instruction> InstructionFactory::MakeInstruction(const std::vector<Token>& tokens) const{
     switch(tokens[0].token_type) {
         case TokenType::Load: {

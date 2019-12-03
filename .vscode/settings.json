@@ -89,6 +89,8 @@
         "optional": "cpp",
         "stack": "cpp",
         "memory_resource": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "__tree": "cpp",
+        "map": "cpp"
     }
 }

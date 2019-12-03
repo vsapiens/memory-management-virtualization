@@ -14,7 +14,7 @@
 
 int GetNextFinalize(std::vector<std::vector<sisops::Token>> token_list, int init) {
     int i = init;
-    while (token_list[i][0].token_type != sisops::TokenType::Finalize) {
+    while ((token_list[i][0].token_type != sisops::TokenType::Finalize && token_list[i][0].token_type != sisops::TokenType::Exit) && i < token_list.size()) {
         i++;
     }
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
     bool fifo = argv[1][1] == 'f';
 
-    auto result = sisops::readAndParseInputFile("test.txt");
+    auto result = sisops::readAndParseInputFile("real_test.txt");
     std::vector<std::vector<sisops::Token>> token_list = std::get<0>(result);
     std::vector<sisops::Error> errors = std::get<1>(result);
 
@@ -42,12 +42,14 @@ int main(int argc, char **argv) {
     if (errors.size() > 0) {
         std::cout << "-----------------SYNTAX ERROR-----------------" << std:: endl;
         for (const sisops::Error& e: errors) {
-            std::cout << "PARSER: Line " << e.line << ": " << e.message << std::endl;
+            std::cout << "PARSER: Line " << e.line+1 << ": " << e.message << std::endl;
+            token_list.erase(token_list.begin()+e.line);
         }
-        exit(1);
+        std::cout << std::endl << "WARNING: PARSING ERRORS. CONTINUING OMITING LINES WITH ERRORS" << std::endl << std::endl;
     } else {
         std::cout << "PARSER: File free from errors" << std::endl;
     }
+
 
     sisops::ProcessManager pm(fifo);
 
@@ -57,15 +59,17 @@ int main(int argc, char **argv) {
         for (const std::string& message : result.messages_) {
             std::cout << message << std::endl;
         }
-        std::cout << std::endl;
         // If there's an error, display error message
+
         if (result.critical_error_) {
             std::cout << "-----------CRITICAL ERROR------------" << std::endl;
+            std::cout << "Jumping to next block of instructions after next F instruction..." << std::endl;
             int finalize_position = GetNextFinalize(token_list, i);
             i = finalize_position;
             pm.DoProcess(token_list[i]);
         } else { 
             // Nothing.
         }
+        std::cout << std::endl;
     }
 }
