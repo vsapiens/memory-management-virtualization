@@ -285,8 +285,7 @@ void ProcessManager::OutputMetrics() {
 
     current_status.messages_.push_back("Average Turnaround: " + std::to_string(avg_turnaround));
     current_status.messages_.push_back("Page Faults: " + std::to_string(page_faults));
-    current_status.messages_.push_back("Swap In Operations: " + std::to_string(swapIn_operations));
-    current_status.messages_.push_back("Swap Out Operations: " + std::to_string(swapOut_operations));
+    current_status.messages_.push_back("Swap In/Out Operations: " + std::to_string(swapIn_operations + swapOut_operations));
 
 }
 
