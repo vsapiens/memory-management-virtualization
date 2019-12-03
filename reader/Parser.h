@@ -43,7 +43,12 @@ class Parser {
 };
 
 Parser::Parser() : parse_status(){}
-
+/*
+Function: Parser::parseIns
+    This function access the instruction
+Parameters: std::vector<Token> tokens
+Return: ParseStatus
+*/
 ParseStatus Parser::parseIns(std::vector<Token> tokens) {
     token_index = 0;
 
@@ -87,26 +92,51 @@ ParseStatus Parser::parseIns(std::vector<Token> tokens) {
 
     return parse_status;
 }
-
+/*
+Function: Parser::parsePPart
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parsePPart(std::vector<Token> tokens) {
     parseInteger(tokens);
     parseInteger(tokens);
 }
-
+/*
+Function: Parser::parseAPart
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parseAPart(std::vector<Token> tokens) {
     parseInteger(tokens);
     parseInteger(tokens);
     parseBit(tokens);
 }
-
+/*
+Function: Parser::parseLPart
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parseLPart(std::vector<Token> tokens) {
     parseInteger(tokens);
 }
-
+/*
+Function: Parser::parseCPart
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parseCPart(std::vector<Token> tokens) {
     token_index = tokens.size();
 }
-
+/*
+Function: Parser::parseInteger
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parseInteger(std::vector<Token> tokens) {
     if (token_index >= tokens.size()) {
         if (parse_status.correct) {
@@ -133,7 +163,12 @@ void Parser::parseInteger(std::vector<Token> tokens) {
              }
     }
 }
-
+/*
+Function: Parser::parseBit
+    This function parses the instruction
+Parameters: std::vector<Token> tokens
+Return: -
+*/
 void Parser::parseBit(std::vector<Token> tokens) {
     if (token_index >= tokens.size()) {
         if (parse_status.correct) {
@@ -160,7 +195,12 @@ void Parser::parseBit(std::vector<Token> tokens) {
             break;
     }
 }
-
+/*
+Function: Parser::match
+    This function matches the token
+Parameters: std::vector<Token> tokens, TokenType type
+Return: -
+*/
 void Parser::match(std::vector<Token> tokens, TokenType type) {
         if (token_index >= tokens.size()) {
             parse_status.correct = false;
