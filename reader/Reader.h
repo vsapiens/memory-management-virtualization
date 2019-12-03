@@ -11,24 +11,44 @@
 namespace sisops{
 
 namespace {
-
+/*
+Function: Parser::ltrim
+    This function trims the characters
+Parameters: std::string& str, const std::string& chars = "\t\n\v\f\r "
+Return: std::string&
+*/
 std::string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
 {
     str.erase(0, str.find_first_not_of(chars));
     return str;
 }
- 
+/*
+Function: Parser::rtrim
+    This function trims the characters
+Parameters: std::string& str, const std::string& chars = "\t\n\v\f\r "
+Return: std::string&
+*/
 std::string& rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
 {
     str.erase(str.find_last_not_of(chars) + 1);
     return str;
 }
- 
+/*
+Function: Parser::trim
+    This function trims the characters
+Parameters: std::string& str, const std::string& chars = "\t\n\v\f\r "
+Return: std::string&
+*/
 std::string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
 {
     return ltrim(rtrim(str, chars), chars);
 }
-
+/*
+Function: Parser::readFile
+    This function reads the file
+Parameters: std::string file
+Return: std::vector<std::string>
+*/
 std::vector<std::string> readFile(std::string file){
     std::ifstream input;
     input.open(file);
@@ -54,7 +74,12 @@ struct Error {
         message = m;
     }
 };
-
+/*
+Function: readAndParseInputFile
+    This functions reads and parses the file
+Parameters: std::string file
+Return: std::tuple<std::vector<std::vector<Token>>, std::vector<Error>>
+*/
 std::tuple<std::vector<std::vector<Token>>, std::vector<Error>> readAndParseInputFile(std::string file) {
     std::vector<std::string> instructions = readFile(file);
 

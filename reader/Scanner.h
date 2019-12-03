@@ -35,9 +35,19 @@ class Scanner {
         {115, 115, 115, 115, 115, 115, 115, 7, 118, 7, 7},
     };
 };
-
+/*
+Function: Scanner::Scanner()
+    Constructor scanner
+Parameters: std::string file
+Return: -
+*/
 Scanner::Scanner(){}
-
+/*
+Function: getEndWord
+    This functions gets the end of the word
+Parameters: std::string s, int init
+Return: int
+*/
 int Scanner::getEndWord(std::string s, int init) {
     for (int i = init; i < s.length(); i++) {
         if (s[i] == ' ') {
@@ -47,7 +57,12 @@ int Scanner::getEndWord(std::string s, int init) {
 
     return s.length()-1;
 }
-
+/*
+Function: Scanner::scan
+    This function scans the file
+Parameters: std::string str
+Return: std::vector<Token> 
+*/
 std::vector<Token> Scanner::scan(std::string str) {
     str += " "; // We added this so the last token is read.
     char c;
@@ -131,7 +146,12 @@ std::vector<Token> Scanner::scan(std::string str) {
 
     return tokens;
 }
-
+/*
+Function: Scanner::filter
+    This function filters the char and gives it to the token 
+Parameters: char c
+Return: int 
+*/
 int Scanner::filter(char c) {
     switch(c) {
         case 'P':

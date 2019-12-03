@@ -17,7 +17,12 @@ enum class TokenType {
     One,
     Unset
 };
-
+/*
+Function: token_type_to_string
+    The function identifies the token type and matches it to the string
+Parameters: TokenType tt
+Return: std::string
+*/
 std::string token_type_to_string(TokenType tt) {
     switch(tt) {
         case TokenType::Load:
@@ -51,7 +56,12 @@ struct Token
     std::string value = "Unset";
 
     Token() {}
-
+/*
+Function: Token
+    Constructor of the token type and its correspondent value
+Parameters: TokenType tt, std::string val
+Return: -
+*/
     Token(TokenType tt, std::string val) {
         token_type = tt;
         value = val;
