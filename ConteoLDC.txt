@@ -1,0 +1,22 @@
+PARTES BASE:
+--------------------------------------------
+PARTES NUEVAS:
+   PageSize T=6, I=0
+   instruction/AccessInstruction T=25, I=0
+   instruction/CommentInstruction T=15, I=0
+   instruction/ExitInstruction T=9, I=0
+   instruction/FinalizeInstruction T=9, I=0
+   instruction/FreeInstruction T=15, I=0
+   instruction/Instruction T=31, I=0
+   instruction/InstructionFactory T=37, I=0
+   instruction/LoadInstruction T=21, I=0
+   process_manager/Process T=49, I=0
+   process_manager/ProcessManager T=330, I=0
+   reader/Parser T=123, I=0
+   reader/Reader T=47, I=0
+   reader/Scanner T=136, I=0
+   reader/Token T=46, I=0
+--------------------------------------------
+PARTES REUSADAS:
+--------------------------------------------
+Total de LDC=899
