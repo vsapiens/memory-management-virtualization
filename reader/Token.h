@@ -17,7 +17,12 @@ enum class TokenType {
     One,
     Unset
 };
-
+/*
+Function: token_type_to_string
+    This function filters the char and gives it to the token 
+Parameters: TokenType tt
+Return: std::string
+*/
 std::string token_type_to_string(TokenType tt) {
     switch(tt) {
         case TokenType::Load:
