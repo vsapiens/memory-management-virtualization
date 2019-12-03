@@ -210,13 +210,15 @@ void ProcessManager::SwapPage(PageIdentifier new_page) {
     int swapping_frame_number = GetFreeSwappingFrame();
 
     swapping_memory[swapping_frame_number].page_identifier_ = real_memory[victim_frame_number].page_identifier_;
+    swapping_memory[swapping_frame_number].free_ = false;
     real_memory[victim_frame_number].page_identifier_ = new_page;
 
 
     int victim_pid = swapping_memory[swapping_frame_number].page_identifier_.process_id_;
     int victim_page = swapping_memory[swapping_frame_number].page_identifier_.page_;
 
-    current_status.messages_.push_back("Swapped out process " + std::to_string(victim_pid) + ", page " + std::to_string(victim_page) + " into swapping memory");
+    current_status.messages_.push_back("Swapped out process " + std::to_string(victim_pid) + ", page " + std::to_string(victim_page) 
+        + " which was on frame " + std::to_string(victim_frame_number) + ", and moved into frame " + std::to_string(swapping_frame_number) + " of swapping memory");
 
     processes.find(victim_pid)->second.SetValid(victim_page, false);
 
@@ -427,13 +429,18 @@ void ProcessManager::Access(const std::shared_ptr<Instruction> current_instructi
 
 void ProcessManager::FreeAux(int id) {
     std::queue<PageIdentifier> temp;
+
+    std::string swapping_frames = "";
+
     // Set the frames of the swapping and real memory as free if they belong to the process.
     for (int i = 0; i < swapping_memory.size(); i++) {
         if(!swapping_memory[i].free_ && swapping_memory[i].page_identifier_.process_id_ == id) {
             swapping_memory[i].free_ = true;
-
+            swapping_frames += std::to_string(i) + ", ";
         }
     }
+
+
 
     std::string frames = "";
 
@@ -445,6 +452,7 @@ void ProcessManager::FreeAux(int id) {
     }
 
     current_status.messages_.push_back("Freeing the following frame numbers: " + frames);
+    current_status.messages_.push_back("Freeing the following swapping frame numbers: " + swapping_frames);
     time += std::ceil((float)processes[id].GetSize() / (float) PAGE_SIZE) * 0.1;
 
     // If they are different processes, push them into another queue.
